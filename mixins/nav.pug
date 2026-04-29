@@ -1,7 +1,8 @@
-mixin nav 
-        li
-          a(href='/index') Home
-        li
-          a(href='/explorar') Explorar
-        li
-          a(href='/perfil') Ver Perfil
+mixin nav(className = "nav")
+  ul(class=className)
+      li
+        a(href='/index') Home
+      li
+        a(href='/explorar') Explorar
+      li
+        a(href='/perfil') Ver Perfil
