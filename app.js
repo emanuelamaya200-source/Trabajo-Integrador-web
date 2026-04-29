@@ -23,6 +23,10 @@ app.get("/login",(req, res , next)=>{
     res.render("login");
 })
 
+app.get("/signup",(req, res , next)=>{
+    res.render("registrarse");
+})
+
 // lisener del servidor
 app.listen(PORT, (err) => {
   if(err) {

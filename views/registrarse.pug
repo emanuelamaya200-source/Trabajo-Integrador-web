@@ -1,0 +1,27 @@
+extends layout 
+
+block content 
+    form(action='' method='POST' style='display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: auto')
+        h3 Registro
+
+        label(for='email') Email
+        input#email(type='email' name='email')
+
+        label(for='contrasena') Contraseña
+        input#contrasena(type='password' name='contrasena')
+
+        label(for='repetir') Repetir contraseña
+        input#repetir(type='password' name='repetir')
+
+        div(style='display: flex; flex-direction: row; justify-content: space-around')
+            div(style='display: flex; flex-direction: column')
+                label(for='tyc')
+                    | Acepta los 
+                    a(href='') términos y condiciones
+                input#tyc(type='checkbox' name='terminos')
+
+            div(style='display: flex; flex-direction: column')
+                label(for='ofertas') Recibir ofertas
+                input#ofertas(type='checkbox' name='ofertas')
+
+        input(type='submit' value='Registrarse')
