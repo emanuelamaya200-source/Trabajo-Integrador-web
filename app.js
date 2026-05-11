@@ -1,6 +1,10 @@
 import 'dotenv/config';
 import express from 'express';
 import pug from 'pug';
+import { sequelize, conectar } from './conexion.js';
+
+await conectar();
+
 // CONSTANTES
 const PORT = process.env.PORT;
 const app = express();
@@ -13,6 +17,8 @@ app.set('views', './views');
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+
 
 // rutas
 app.get("/",(req, res , next)=>{
