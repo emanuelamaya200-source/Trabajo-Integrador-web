@@ -2,8 +2,12 @@ import 'dotenv/config';
 import express from 'express';
 import pug from 'pug';
 import { sequelize, conectar } from './conexion.js';
+import { Sincronizar } from './sync.js';
 
+//conectar
 await conectar();
+//sincronizar
+await Sincronizar();
 
 // CONSTANTES
 const PORT = process.env.PORT;

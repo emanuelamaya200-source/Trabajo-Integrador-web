@@ -1,9 +1,7 @@
 import 'dotenv/config.js';
 import { Sequelize } from 'sequelize';
 
-
-
-const sequelize = new Sequelize(
+export const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
   process.env.DB_PASSWORD,
@@ -19,11 +17,11 @@ const sequelize = new Sequelize(
 async function conectar() {
   try {
     await sequelize.authenticate();
-    console.log('la conexion se estableio');
+    console.log('la conexion se establecio');
+
   } catch (err) {
     console.error('error al conectarse:', err);
    
   }
 }
-
-export { sequelize, conectar };
+export { conectar };
