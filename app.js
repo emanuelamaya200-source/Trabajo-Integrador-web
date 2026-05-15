@@ -3,6 +3,9 @@ import express from 'express';
 import pug from 'pug';
 import { sequelize, conectar } from './conexion.js';
 import { Sincronizar } from './sync.js';
+// routers
+import RegYLogin from './controller/registroylogin.js';
+
 
 //conectar
 await conectar();
@@ -26,16 +29,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // rutas
 app.get("/",(req, res , next)=>{
-    res.render("layout");
+    res.render("layout");  
 })
 
-app.get("/login",(req, res , next)=>{
-    res.render("login");
-})
-
-app.get("/signup",(req, res , next)=>{
-    res.render("registrarse");
-})
+// para usar las rutas en un router
+app.use(RegYLogin);
 
 // lisener del servidor
 app.listen(PORT, (err) => {
