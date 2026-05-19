@@ -1,0 +1,233 @@
+extends ../layout 
+
+block estilo
+  style.
+    * { color: white; box-sizing: border-box; }
+    body {
+      background-color: rgb(100, 100, 100);
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      overflow: hidden;
+    }
+    h1 { text-align: center; height: 5vh; }
+    #contenedor {
+      display: flex;
+      gap: 20px;
+      height: 88vh;
+    }
+    #parteIzquierda, #parteDerecha {
+      width: 25%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #galeria, #Licencia, #categoriasTendencia, #agregarEtiqueta, #etiquetasAgregadas {
+      border: 1px solid rgb(100, 255, 100);
+      border-radius: 5px;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    #galeria, #Licencia { height: 50%; }
+    #categoriasTendencia, #agregarEtiqueta { height: 33%; }
+    #etiquetasAgregadas { height: 34%; }
+    #galeria img { max-width: 150px; max-height: 150px; object-fit: cover; margin: 1px; }
+    #form {
+      width: 50%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-radius: 5px;
+      border: 3px solid rgb(100, 255, 100);
+      padding: 15px;
+      overflow-y: auto;
+    }
+    #form div { display: flex; flex-direction: column; gap: 5px; }
+    #espacioimagen {
+      width: 100%;
+      height: 20vh;
+      background-color: rgb(24, 26, 24);
+      border-radius: 5px;
+      border: 1px solid black;
+      opacity: 0.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .size-6 { height: 10vh; width: auto; }
+    #imagen, #titulo, .etiqueta {
+      width: 100%;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid rgb(100, 255, 100);
+      background-color: rgb(0, 43, 40);
+    }
+    #descripcion {
+      width: 100%;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid rgb(100, 255, 100);
+      background-color: rgb(0, 43, 40);
+      height: 20vh;
+      resize: none;
+    }
+    button {
+      padding: 8px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      background-color: rgb(100, 255, 100);
+      color: black;
+    }
+    .fila { display: flex; flex-direction: row; gap: 5px; align-items: center; }
+    .columna { display: flex; flex-direction: column; gap: 5px; }
+    .licencia-input {
+      width: 100%;
+      padding: 4px;
+      border-radius: 4px;
+      border: 1px solid rgb(100, 255, 100);
+      background-color: rgb(0, 43, 40);
+      margin-top: 4px;
+    }
+
+block content
+  h1 Crear Publicacion
+
+  div#contenedor
+
+    div#parteIzquierda
+      div#galeria
+        p Imagenes Seleccionadas (recomendada una por publicacion)
+      div#Licencia
+        h2 Licencias
+        div#listaLicencias
+
+    form#form(action='/CrearPublicacion' method='POST')
+      div
+        label(for='imagen') Imagen
+        div#espacioimagen
+          p arrastrar imagen
+          svg#img1.size-6(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor')
+            path#img2(fill-rule='evenodd' d='M11.47 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06l-3.22-3.22V16.5a.75.75 0 0 1-1.5 0V4.81L8.03 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5ZM3 15.75a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z' clip-rule='evenodd')
+        p o sino subir desde la pc
+        input#imagen(type='file' name='imagen' multiple)
+      div
+        label(for='titulo') Titulo
+        input#titulo(type='text' name='titulo' required)
+      div
+        label(for='descripcion') Descripcion
+        textarea#descripcion(name='descripcion' required cols='20' rows='5')
+      button(type='submit') Crear
+
+    div#parteDerecha
+      div#categoriasTendencia
+        p Categorías en Tendencia
+        ul
+          each item in []
+            li= item
+      div#agregarEtiqueta
+        label(for='etiqueta') Agrega una nueva Etiqueta
+        input#etiqueta.etiqueta(name='etiqueta')
+        button#agregare(type='button') Agregar
+      div#etiquetasAgregadas
+        p Etiquetas Agregadas
+
+  script.
+    let todasLasImagenes = [];
+    let todasLasEtiquetas = [];
+    const zona = document.getElementById('espacioimagen');
+    const galeria = document.getElementById('galeria');
+    const form = document.getElementById('form');
+    const agregare = document.getElementById('agregare');
+    const etiquetasAgregadas = document.getElementById('etiquetasAgregadas');
+    const listaLicencias = document.getElementById('listaLicencias');
+    const inputFile = document.getElementById('imagen'); 
+
+    agregare.addEventListener('click', () => {
+      const input = document.getElementById('etiqueta');
+      if (input.value) {
+        const p = document.createElement('p');
+        p.textContent = input.value;
+        etiquetasAgregadas.appendChild(p);
+        todasLasEtiquetas.push(input.value);
+        input.value = '';
+      }
+    });
+
+    zona.addEventListener('dragover', (e) => { e.preventDefault(); });
+    zona.addEventListener('dragenter', (e) => { e.preventDefault(); });
+
+    function procesarArchivos(archivos) {
+      for (const imagen of archivos) {
+        const reader = new FileReader();
+        reader.readAsDataURL(imagen);
+        reader.onload = (ev) => {
+          const base64 = ev.target.result;
+          const obj = { base64: base64, nombre: imagen.name, copyrigth: false, licencia: '' };
+          todasLasImagenes.push(obj);
+
+          const img = document.createElement('img');
+          img.src = base64;
+          galeria.appendChild(img);
+
+          const col = document.createElement('div');
+          col.className = 'columna';
+
+          const fila = document.createElement('div');
+          fila.className = 'fila';
+
+          const li = document.createElement('p');
+          li.textContent = imagen.name + ' tiene licencia?';
+
+          const check = document.createElement('input');
+          check.type = 'checkbox';
+
+          const inputLicencia = document.createElement('input');
+          inputLicencia.className = 'licencia-input';
+          inputLicencia.placeholder = imagen.name;
+          inputLicencia.style.display = 'none';
+
+          check.addEventListener('change', () => {
+            inputLicencia.style.display = check.checked ? 'block' : 'none';
+            obj.copyrigth = check.checked;
+          });
+
+          inputLicencia.addEventListener('blur', () => {
+            obj.licencia = inputLicencia.value;
+          });
+
+          fila.appendChild(li);
+          fila.appendChild(check);
+          col.appendChild(fila);
+          col.appendChild(inputLicencia);
+          listaLicencias.appendChild(col);
+        };
+      }
+    }
+
+    zona.addEventListener('drop', (e) => {
+      e.preventDefault();
+      procesarArchivos(e.dataTransfer.files);
+    });
+
+    inputFile.addEventListener('change', (e) => {
+      procesarArchivos(e.target.files);
+    });
+
+    // submit
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      fetch('/CrearPublicacion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imagenes: todasLasImagenes,
+          titulo: document.getElementById('titulo').value,
+          descripcion: document.getElementById('descripcion').value,
+          etiquetas: todasLasEtiquetas
+        })
+      })
+    });

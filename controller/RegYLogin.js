@@ -1,10 +1,10 @@
 import express from 'express';
-import { Usuario } from '../modules/Usuario.js'
-
+import { Usuario } from '../modules/Usuario.js';
 const RegYLogin = express.Router();
 
 RegYLogin.get("/login", (req, res) => {
-    res.render("login");
+    // se escribe sin ./
+    res.render("RegistroYLogin/login");
 });
 
 RegYLogin.post("/login", (req, res) => {
@@ -14,11 +14,11 @@ RegYLogin.post("/login", (req, res) => {
 
 // registrarse
 RegYLogin.get("/signup", (req, res) => {
-    res.render("registrarse");
+    res.render("RegistroYLogin/registrarse");
 });
 
 // recibir registro
-RegYLogin.post("/signup", async (req, res) => {
+RegYLogin.post("/registro", async (req, res) => {
     try {
         const { usuario, contrasenia, email } = req.body;
         const ofertas = req.body.ofertas === 'on';
@@ -34,10 +34,10 @@ RegYLogin.post("/signup", async (req, res) => {
 });
 
 RegYLogin.get("/welcome",(req,res)=>{
-    res.render("")
+    res.render("welcome")
 })
 
-
+//revisar 
 RegYLogin.get("/revisarEmail", async (req, res) => {
     const { email } = req.query;
     const respuesta = await Usuario.revisarEmail(email);

@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import {sequelize} from "../conexion.js";
+import { sequelize } from '../conexion.js';
 
 export class Usuario extends Model {
     
@@ -76,4 +76,3 @@ Usuario.init(
         modelName: 'Usuario',
     }
 );
-

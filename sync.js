@@ -5,7 +5,7 @@ import { Compra } from "./modules/Compra.js"
 import { Denuncia_comentario } from "./modules/Denuncia_comentario.js"
 import { Denuncia_publicacion } from "./modules/Denuncia_publicacion.js"
 import { Denuncia_usuario } from "./modules/Denuncia_usuario.js"
-import { Etiquetas } from "./modules/Etiquetas.js"
+import { Etiqueta } from "./modules/Etiqueta.js"
 import { Favoritos } from "./modules/Favoritos.js"
 import { Imagen } from "./modules/Imagen.js"
 import { Notificacion } from "./modules/Notificacion.js"
@@ -56,9 +56,10 @@ async function RelacionarTablas() {
     Publicacion.hasMany(Comentario);
     Comentario.belongsTo(Publicacion);
     
-    Publicacion.hasMany(Etiquetas);
-    Etiquetas.belongsTo(Publicacion);
-    
+    // muchos a muchos, el throught es el nombre de la relacion y foreign key se pasa los id
+    Publicacion.belongsToMany(Etiqueta, { through: 'PublicacionEtiqueta', foreignKey: 'publicacionId' });
+    Etiqueta.belongsToMany(Publicacion, { through: 'PublicacionEtiqueta', foreignKey: 'etiquetaId' });
+      
     Publicacion.hasOne(Validador);
     Validador.belongsTo(Publicacion);
   

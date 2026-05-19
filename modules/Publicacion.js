@@ -1,7 +1,31 @@
 import { Model,DataTypes } from "sequelize";
-import {sequelize} from "../conexion.js";
+import { sequelize } from "../conexion.js";
+import { Etiqueta } from "./Etiqueta.js";
 
-export class Publicacion extends Model {}
+export class Publicacion extends Model {
+      
+  static async crearPublicacion(titulo, descripcion, etiquetas) {
+    try {
+      const publi = await Publicacion.create({
+        title: titulo,
+        description: descripcion,
+      });
+      
+      for (const nombreEtiqueta of etiquetas) {
+        const [etiqueta] = await Etiqueta.findOrCreate({
+          where: { nombre: nombreEtiqueta }
+        });
+
+        await publi.addEtiqueta(etiqueta); 
+      }
+      
+      return publi;
+      
+    } catch(err) {
+      console.log("Error al crear publicacion:", err);
+    }
+  }
+}
 
 Publicacion.init(
   {
@@ -11,16 +35,12 @@ Publicacion.init(
       primaryKey: true,
       allowNull: false,
     },
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-
-    },
     estado: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: true,
     },
-    tittle: {
+    title: {
       type: DataTypes.STRING(50),
       allowNull: false,
     },
@@ -30,7 +50,7 @@ Publicacion.init(
     },
     comments_allowed: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
+      allowNull: true,
     },
     cantidad_denuncias: {
       type: DataTypes.INTEGER,
@@ -44,6 +64,8 @@ Publicacion.init(
       type: DataTypes.FLOAT,
       allowNull: true,
     },
+    
+
   },
   {
     sequelize, 
@@ -54,3 +76,5 @@ Publicacion.init(
     updatedAt: true,
   },
 );
+
+export default Publicacion;

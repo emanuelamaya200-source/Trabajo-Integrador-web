@@ -1,7 +1,21 @@
 import { Model,  DataTypes } from "sequelize";
-import {sequelize} from "../conexion.js";
+import { sequelize } from "../conexion.js";
 
-export class Imagen extends Model {}
+export class Imagen extends Model {
+    static async crearImagen(post , purl ,pcopyright, plicencia){
+        try {
+            const Ima = Imagen.build({             
+            post_id : post,
+            url: purl,
+            licencia: plicencia,
+            copyrigth: pcopyright,
+        })
+        await Ima.save();
+        return Ima;
+        }
+        catch(err){console.log(err)}  
+    }
+}
 
 Imagen.init({
   id: {
@@ -15,27 +29,30 @@ Imagen.init({
     allowNull: false,
   },
   url: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
-  },
-  tipo: {
-    type: DataTypes.STRING(50),
   },
   promedio: {
     type: DataTypes.FLOAT,
+    allowNull: true,
   },
   copyrigth: {
     type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: true,
   },
   licencia: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true,
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: false,
   },
   marcaAgua: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
   texto_personalizado: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
 }, {
   sequelize,
