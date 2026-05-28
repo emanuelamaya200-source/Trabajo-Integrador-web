@@ -5,7 +5,7 @@ export class Imagen extends Model {
     static async crearImagen(post , purl ,pcopyright, plicencia){
         try {
             const Ima = Imagen.build({             
-            post_id : post,
+            publicacion_id : post,
             url: purl,
             licencia: plicencia,
             copyrigth: pcopyright,
@@ -15,7 +15,7 @@ export class Imagen extends Model {
         }
         catch(err){console.log(err)}  
     }
-}
+  }
 
 Imagen.init({
   id: {
@@ -23,10 +23,13 @@ Imagen.init({
     autoIncrement: true,
     primaryKey: true,
     allowNull: false,
-  },
-  post_id: {
+  },publicacion_id:{
     type: DataTypes.INTEGER,
     allowNull: false,
+    references:{
+      model: 'publicaciones',
+      key: 'id'
+    }
   },
   url: {
     type: DataTypes.TEXT,

@@ -103,6 +103,7 @@ block content
         p Imagenes Seleccionadas (recomendada una por publicacion)
       div#Licencia
         h2 Licencias
+        p solo se permite texto
         div#listaLicencias
 
     form#form(action='/CrearPublicacion' method='POST')
@@ -206,7 +207,7 @@ block content
           listaLicencias.appendChild(col);
         };
       }
-    }
+      }
 
     zona.addEventListener('drop', (e) => {
       e.preventDefault();
@@ -218,16 +219,27 @@ block content
     });
 
     // submit
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      fetch('/CrearPublicacion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imagenes: todasLasImagenes,
-          titulo: document.getElementById('titulo').value,
-          descripcion: document.getElementById('descripcion').value,
-          etiquetas: todasLasEtiquetas
-        })
-      })
+      try {
+        const res = await fetch('/CrearPublicacion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imagenes: todasLasImagenes,
+            titulo: document.getElementById('titulo').value,
+            descripcion: document.getElementById('descripcion').value,
+            etiquetas: todasLasEtiquetas
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) return alert('Hubo un error al crear la publicación');
+        
+        window.location.replace("http://localhost:3000/welcome")
+
+      } catch (err) {
+        console.error("Error:", err);
+      }
     });

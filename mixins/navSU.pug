@@ -1,4 +1,4 @@
-mixin nav(className = "navc")
+mixin navSinUsuario(className = "navsinc")
   ul(class=className)
     li
       a(href='/') Home
@@ -7,16 +7,14 @@ mixin nav(className = "navc")
     li
       input#buscar(type="text", name="Buscar" placeholder="Buscar")
     li
-      a(href='/crearPublicacion') Crear Publicación
+      a#iniciar(href='/login') Iniciar Sesion
     li
-      a#perfil(href='/perfil') Ver Perfil
+      a#registrarse(href='/signup') Registrarse
 
   script.
     const buscar = document.querySelector("#buscar");
     buscar.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        // recordar empezar con / al principio
-        // window location href o sino window location replace
         window.location.href = `/Buscar/${buscar.value}`;
       }
     });

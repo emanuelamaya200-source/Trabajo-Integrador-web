@@ -4,8 +4,8 @@ import pug from 'pug';
 import { sequelize, conectar } from './conexion.js';
 import { Sincronizar } from './sync.js';
 // routers
-import RegYLogin from './controller/RegYLogin.js';
-import Publis from './controller/Publicaciones.js';
+import Publicaciones from"./rutas/Publicaciones.js"
+import RegYLogin from"./rutas/RegYLogin.js"
 
 
 
@@ -35,12 +35,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // para usar las rutas en un router
 app.use(RegYLogin);
-app.use(Publis)
+app.use(Publicaciones)
 
 // rutas
 app.get("/",(req, res , next)=>{
     res.render("layout");  
 })
+
+// welcome sirve para mostrar un solo mensaje
+Publicaciones.get('/welcome', (req, res) => {
+  try{
+    res.render('./extra/welcome', { nombre: "Publicación Creada" });
+}catch(err){
+  console.log(err)
+  res.status(500).send("error en el servidor")
+  }
+});
 
 // lisener del servidor
 app.listen(PORT, (err) => {

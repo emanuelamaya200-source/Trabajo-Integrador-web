@@ -1,4 +1,6 @@
 include ../mixins/nav.pug 
+include ../mixins/navSU.pug 
+
 doctype html
 html
     head
@@ -11,8 +13,13 @@ html
     body
         nav
             ul
+            if (Cuenta)
                 +nav
+            else 
+                +navSinUsuario
+
         main
             div(style="padding: 20px")
                 block content
+                block mensajes
         script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js' integrity='sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI' crossorigin='anonymous')

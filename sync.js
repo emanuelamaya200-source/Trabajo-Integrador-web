@@ -1,19 +1,20 @@
 import { sequelize } from "./conexion.js"
-import { Coleccion } from "./modules/Coleccion.js"
-import { Comentario } from "./modules/Comentario.js"
-import { Compra } from "./modules/Compra.js"
-import { Denuncia_comentario } from "./modules/Denuncia_comentario.js"
-import { Denuncia_publicacion } from "./modules/Denuncia_publicacion.js"
-import { Denuncia_usuario } from "./modules/Denuncia_usuario.js"
-import { Etiqueta } from "./modules/Etiqueta.js"
-import { Favoritos } from "./modules/Favoritos.js"
-import { Imagen } from "./modules/Imagen.js"
-import { Notificacion } from "./modules/Notificacion.js"
-import { Publicacion } from "./modules/Publicacion.js"
-import { Seguidor } from "./modules/Seguidor.js"
-import { Usuario } from "./modules/Usuario.js"
-import { Validador } from "./modules/valida.js"
-import { Valoracion } from "./modules/Valoracion.js"
+import { Coleccion } from "./modelos/Coleccion.js"
+import { Comentario } from "./modelos/Comentario.js"
+import { Compra } from "./modelos/Compra.js"
+import { Denuncia_comentario } from "./modelos/Denuncia_comentario.js"
+import { Denuncia_publicacion } from "./modelos/Denuncia_publicacion.js"
+import { Denuncia_usuario } from "./modelos/Denuncia_usuario.js"
+import { Etiqueta } from "./modelos/Etiqueta.js"
+import { Favoritos } from "./modelos/Favoritos.js"
+import { Imagen } from "./modelos/Imagen.js"
+import { Notificacion } from "./modelos/Notificacion.js"
+import { Publicacion } from "./modelos/Publicacion.js"
+import { Seguidor } from "./modelos/Seguidor.js"
+import { Usuario } from "./modelos/Usuario.js"
+import { Validador } from "./modelos/valida.js"
+import { Valoracion } from "./modelos/Valoracion.js"
+import {PublicacionEtiqueta}  from "./modelos/PublicacionEtiqueta.js"
 
 async function RelacionarTablas() {
   try {
@@ -49,16 +50,27 @@ async function RelacionarTablas() {
 
     Publicacion.hasMany(Denuncia_publicacion);
     Denuncia_publicacion.belongsTo(Publicacion);
-   
-    Publicacion.hasMany(Imagen);
-    Imagen.belongsTo(Publicacion);
     
-    Publicacion.hasMany(Comentario);
-    Comentario.belongsTo(Publicacion);
+    Publicacion.hasMany(Imagen, { as: 'imagenes', foreignKey: 'publicacion_id' });
+    Imagen.belongsTo(Publicacion,{foreignKey: 'publicacion_id'});
     
-    // muchos a muchos, el throught es el nombre de la relacion y foreign key se pasa los id
-    Publicacion.belongsToMany(Etiqueta, { through: 'PublicacionEtiqueta', foreignKey: 'publicacionId' });
-    Etiqueta.belongsToMany(Publicacion, { through: 'PublicacionEtiqueta', foreignKey: 'etiquetaId' });
+    Publicacion.hasMany(Imagen, { as: "imagenes", foreignKey: "publicacion_id" });
+    Imagen.hasMany(Comentario, { as: "comentarios", foreignKey: "imagen_id" });
+    
+    
+    Publicacion.belongsToMany(Etiqueta, { 
+        through: PublicacionEtiqueta, 
+        foreignKey: 'publicacionId',
+        otherKey: 'etiquetaId',
+        as: 'etiquetas'
+    });
+
+    Etiqueta.belongsToMany(Publicacion, { 
+        through: PublicacionEtiqueta, 
+        foreignKey: 'etiquetaId',
+        otherKey: 'publicacionId',
+        as: 'publicaciones'
+    });
       
     Publicacion.hasOne(Validador);
     Validador.belongsTo(Publicacion);
@@ -69,6 +81,8 @@ async function RelacionarTablas() {
     Imagen.hasMany(Valoracion);
     Valoracion.belongsTo(Imagen);
 
+    Imagen.hasMany(Comentario);
+    Comentario.belongsTo(Imagen);
     
     Usuario.hasMany(Notificacion);
     Notificacion.belongsTo(Usuario);

@@ -1,0 +1,46 @@
+mixin publicacion(item)
+  div.publicacion
+    div#publicacionparteuno
+      if item.imagenes && item.imagenes.length > 0 
+        div 
+          img#izquierda(src="/left.png", alt="izquierda")
+        div 
+          img#derecha(src="", alt="publicacion", style="width: 200px;")
+          div valorar
+        div
+          img#imagen(src="/right.png", alt="derecha")
+      else
+        p imagen no encontrada
+          
+      h1= item.titulo
+      p= item.descripcion
+
+      if item.etiquetas && item.etiquetas.length > 0
+        div 
+          ul
+            each etiqueta in item.etiquetas
+              li= etiqueta.nombre
+      else
+        p.sin-etiquetas Sin etiquetas
+
+    div#publicacioncomentarios
+      h1 Comentarios
+        
+      
+    script.
+
+      let izquierda = Document: querySelector(#izquierda)
+      let derecha = Document: querySelector(#derecha)
+      let imagen = 0;
+
+      function cargarImagen(){
+
+
+
+        // preparar elementos
+      const Img = document.createElement("img");
+      img.setAttribute(src,"")
+      }
+    
+
+

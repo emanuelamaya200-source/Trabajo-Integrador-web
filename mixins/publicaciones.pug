@@ -1,0 +1,22 @@
+mixin publicaciones(item)
+  a(href=`/verPublicacion/${item.id}` target="_blank" class="enlace-publicacion")
+    div.publicaciones
+      if item.imagenes && item.imagenes.length > 0     
+        div.apilarimagenes
+          ul
+            each val in item.imagenes
+              li
+                img(src=val.url, alt="publicacion", style="width: 200px;")
+      else
+        p imagen no encontrada
+          
+      h1= item.titulo
+      p= item.descripcion
+
+      if item.etiquetas && item.etiquetas.length > 0
+        div.etiquetas-contenedor   
+          ul
+            each etiqueta in item.etiquetas
+              li= etiqueta.nombre
+      else
+        p.sin-etiquetas Sin etiquetas
