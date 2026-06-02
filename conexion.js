@@ -1,7 +1,14 @@
 import 'dotenv/config.js';
 import { Sequelize } from 'sequelize';
 
- const sequelize = new Sequelize(
+const ssl = process.env.DB_SSL === "true" ? {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    }
+  } : undefined;
+
+const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
   process.env.DB_PASSWORD,
@@ -10,6 +17,7 @@ import { Sequelize } from 'sequelize';
     port: process.env.DB_PORT,
     dialect: 'postgres',
     logging: false,
+    dialectOptions: ssl
   }
 );
 
