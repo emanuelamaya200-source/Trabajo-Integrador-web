@@ -2,7 +2,6 @@ import 'dotenv/config';
 import { Sequelize } from 'sequelize';
 import pg from 'pg';
 
-
 const useSSL = process.env.DB_SSL?.trim().toLowerCase() === "true";
 
 const sequelize = new Sequelize(
