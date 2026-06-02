@@ -9,16 +9,16 @@ const ssl = process.env.DB_SSL === "true" ? {
     }
   } : undefined;
 
-// En lugar de usar process.env.DB_HOST, usas el nombre real que tiene en Vercel:
 const sequelize = new Sequelize(
-  process.env.BaseDeDatosTPI_PGDATABASE, 
-  process.env.BaseDeDatosTPI_PGUSER,     
-  process.env.BaseDeDatosTPI_PGPASSWORD, 
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: process.env.BaseDeDatosTPI_PGHOST,
-    port: 5432,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     dialect: 'postgres',
-    dialectModule: pg,
+    dialectModule: 'pg',
+    logging: false,
     dialectOptions: ssl
   }
 );
