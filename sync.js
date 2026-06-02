@@ -51,9 +51,6 @@ async function RelacionarTablas() {
     Publicacion.hasMany(Denuncia_publicacion);
     Denuncia_publicacion.belongsTo(Publicacion);
     
-    Publicacion.hasMany(Imagen, { as: 'imagenes', foreignKey: 'publicacion_id' });
-    Imagen.belongsTo(Publicacion,{foreignKey: 'publicacion_id'});
-    
     Publicacion.hasMany(Imagen, { as: "imagenes", foreignKey: "publicacion_id" });
     Imagen.hasMany(Comentario, { as: "comentarios", foreignKey: "imagen_id" });
     
