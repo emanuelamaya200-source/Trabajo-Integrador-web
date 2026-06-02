@@ -1,4 +1,4 @@
-import { Usuario } from "../modelos/Usuario";
+import { Usuario } from "../modelos/Usuario.js";
 
 export const LoguearseGet = (req,res) => {
     res.render("RegistroYLogin/login");
