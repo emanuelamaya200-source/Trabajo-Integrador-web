@@ -9,18 +9,23 @@ export const LoguearsePost = async (req, res) => {
     try {
         const { campo, contrasenia } = req.body;
         const usuario = await Usuario.buscarPorNombreOEmail(campo);
+        
         if (!usuario) {
             return res.status(401).render('RegistroYLogin/login', { mensajes: "Usuario no encontrado" });
         }
-        
         const contraseniaCorrecta = await bcrypt.compare(contrasenia, usuario.password);
+        
         if (contraseniaCorrecta) {
+            req.session.usuario = {
+                id: usuario.id,
+                username: usuario.username,
+                email: usuario.email
+            };
+
             return res.render('extra/welcome', { nombre: usuario.username }); 
-            
         } else {
             return res.status(401).render('RegistroYLogin/login', { mensajes: "Contraseña incorrecta" });
         }
-
     } catch (error) {
         console.error(error);
         return res.status(500).render('RegistroYLogin/login', { mensajes: "Error interno del servidor" });

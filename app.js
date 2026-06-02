@@ -9,8 +9,6 @@ import Publicaciones from"./rutas/Publicaciones.js"
 import RegYLogin from"./rutas/RegYLogin.js"
 import { requireAuth } from './controller/autenticador.js';
 
-
-
 // CONSTANTES
 const PORT = process.env.PORT;
 const app = express();
@@ -33,6 +31,11 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
+
+app.use((req, res, next) => {
+    res.locals.usuario = req.session.usuario || null;
+    next();
+});
 
 //cargar pug
 app.set("view engine", "pug");
