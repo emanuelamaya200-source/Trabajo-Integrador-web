@@ -1,13 +1,13 @@
-import 'dotenv/config.js';
+import 'dotenv/config';
 import { Sequelize } from 'sequelize';
 import pg from 'pg';
 
-const ssl = process.env.DB_SSL === "true" ? {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    }
-  } : undefined;
+const sslOptions = process.env.DB_SSL === "true" ? {
+  ssl: {
+    require: true,
+    rejectUnauthorized: false,
+  }
+} : false;
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -17,21 +17,19 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: 'postgres',
-    dialectModule: 'pg',
+    dialectModule: pg,
     logging: false,
-    dialectOptions: ssl
+    dialectOptions: sslOptions ? { ssl: sslOptions.ssl } : {}
   }
 );
 
-// Envolver la autenticación en una función async
 async function conectar() {
   try {
     await sequelize.authenticate();
     console.log('la conexion se establecio');
-
   } catch (err) {
     console.error('error al conectarse:', err);
-   
   }
 }
-export { conectar, sequelize};
+
+export { conectar, sequelize };
