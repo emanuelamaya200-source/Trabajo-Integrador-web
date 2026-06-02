@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import session from 'express-session';
 import pug from 'pug';
 import { sequelize, conectar } from './conexion.js';
 import { Sincronizar } from './sync.js';
