@@ -1,4 +1,5 @@
 import { Usuario } from "../modelos/Usuario.js";
+import bcrypt from 'bcrypt';
 
 export const LoguearseGet = (req,res) => {
     res.render("RegistroYLogin/login");
@@ -15,17 +16,20 @@ export const RegistrarseGet = (req, res) => {
 };
 
 // recibir registro
-export const RegistrarsePost =  async (req, res) => {
+export const RegistrarsePost = async (req, res) => {
     try {
         const { usuario, contrasenia, email } = req.body;
+        const saltos = 10;
+        const contraseniaCifrada = await bcrypt.hash(contrasenia, saltos);
         const ofertas = req.body.ofertas === 'on';
-        const creado = await Usuario.crearUsuario(usuario, contrasenia, email, ofertas);
+        const creado = await Usuario.crearUsuario(usuario, contraseniaCifrada, email, ofertas);
         if (creado) {
             res.render('extra/welcome', { nombre: usuario });
         } else {
-            res.end(); 
+            res.status(400).send("No se pudo crear el usuario"); 
         }
     } catch (error) {
+        console.error(error);
         res.status(500).send("Error interno del servidor");
     }
 };
