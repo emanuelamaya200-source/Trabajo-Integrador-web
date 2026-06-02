@@ -1,5 +1,6 @@
 import Publicacion from '../modelos/Publicacion.js';
 import { Imagen } from '../modelos/Imagen.js';
+import { Comentario } from '../modelos/Comentario.js';
 
 export const mostrarFormulario = (req, res) => {
     res.render("Publicaciones/crearPubli");
@@ -57,12 +58,23 @@ export const verUnaPublicacion = async (req, res) => {
     }
 };
 export const crearComentario = async (req, res) => {
+    let post_id = req.body.post_id; 
     try {
         const { contenido } = req.body;
-        await Comentario.create({ contenido });
-        return res.redirect('back');
+        const user_id = req.session.usuario.id;
+
+        await Comentario.create({ 
+            contenido, 
+            post_id, 
+            user_id 
+        });
+
+        return res.redirect(`/verPublicacion/${post_id}`);
     } catch (error) {
         console.error(error);
-        return res.status(500).send("Error al crear el comentario");
+        if (post_id) {
+            return res.redirect(`/verPublicacion/${post_id}`);
+        }
+        return res.redirect('back');
     }
 };

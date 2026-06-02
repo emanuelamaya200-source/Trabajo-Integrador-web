@@ -2,13 +2,14 @@ mixin publicacion(item)
   div.publicacion
     div#publicacionparteuno
       if item.imagenes && item.imagenes.length > 0 
-        div 
-          img#izquierda(src="/left.png", alt="izquierda")
-        div 
-          img#derecha(src="", alt="publicacion", style="width: 200px;")
-          div valorar
-        div
-          img#imagen(src="/right.png", alt="derecha")
+        div#imagenes
+          div 
+            img#izquierda(src="/left.png", alt="izquierda", height="30px", onclick="cambiarImagen(-1)")
+          div 
+            img#imagenPrincipal(src="", alt="publicacion", style="width: 200px;")
+            div#valorar promedio: 0
+          div
+            img#derecha(src="/right.png", alt="derecha", height="30px", onclick="cambiarImagen(1)")
       else
         p imagen no encontrada
           
@@ -24,18 +25,49 @@ mixin publicacion(item)
         p.sin-etiquetas Sin etiquetas
 
     div#publicacioncomentarios
-      h1 Comentarios
-      
-      form(action='/comentario/crear' method='POST')
+      div.lista-comentarios
+        h1 Comentarios
+        div#cajaComentarios(style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;")
+          if item.comentarios && item.comentarios.length > 0
+            each com in item.comentarios
+              div.comentario-item(style="border-bottom: 1px solid #eee; padding: 8px 0;")
+                strong= com.usuario ? com.usuario.username : "Usuario"
+                p(style="margin: 4px 0;")= com.contenido
+          else
+            p.sin-comentarios No hay comentarios aún. Sé el primero en comentar.
+
+      form(action='/crearComentario' method='POST')
+        input(type='hidden' name='post_id' value=item.id)
         textarea(name='contenido' placeholder='Escribe un comentario...' required)
         input(type='submit' value='Comentar')
 
     script.
-      let izquierda = document.querySelector('#izquierda');
-      let derecha = document.querySelector('#derecha');
-      let imagen = 0;
+      let lista = !{JSON.stringify(item.imagenes || [])};
+      let i = 0;
 
       function cargarImagen(){
-        const Img = document.createElement("img");
-        Img.setAttribute("src", "");
+        if(lista.length == 0) return;
+
+        let img = document.querySelector('#imagenPrincipal');
+        let val = document.querySelector('#valorar');
+
+        img.setAttribute("src", lista[i].url);
+        val.innerText = "promedio: " + (lista[i].promedio || 0);
+      }
+
+      function cambiarImagen(dir){
+        i = i + dir;
+
+        if(i < 0){
+          i = lista.length - 1;
+        }
+        if(i >= lista.length){
+          i = 0;
+        }
+
+        cargarImagen();
+      }
+
+      window.onload = function() {
+        cargarImagen();
       }
