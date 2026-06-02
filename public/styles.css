@@ -99,3 +99,16 @@
     border: 1px solid black;
     border-radius: 20px;
 }
+
+/*login*/
+#mensajeslogin p {
+    font-size: 30px;
+    background-color: #000000;
+    color: red;
+    position: absolute;
+    bottom: 0%;
+    right: 50%;
+}
+#iniciopagina{
+    position: relative;
+}

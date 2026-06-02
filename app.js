@@ -6,6 +6,7 @@ import { Sincronizar } from './sync.js';
 // routers
 import Publicaciones from"./rutas/Publicaciones.js"
 import RegYLogin from"./rutas/RegYLogin.js"
+import { requireAuth } from './controller/autenticador.js';
 
 
 
@@ -22,7 +23,15 @@ await Sincronizar();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-
+app.use(session({
+    secret: 'clave-secreta-larga',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24
+    }
+}));
 
 //cargar pug
 app.set("view engine", "pug");

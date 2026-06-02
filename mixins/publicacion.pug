@@ -25,22 +25,17 @@ mixin publicacion(item)
 
     div#publicacioncomentarios
       h1 Comentarios
-        
       
-    script.
+      form(action='/comentario/crear' method='POST')
+        textarea(name='contenido' placeholder='Escribe un comentario...' required)
+        input(type='submit' value='Comentar')
 
-      let izquierda = Document: querySelector(#izquierda)
-      let derecha = Document: querySelector(#derecha)
+    script.
+      let izquierda = document.querySelector('#izquierda');
+      let derecha = document.querySelector('#derecha');
       let imagen = 0;
 
       function cargarImagen(){
-
-
-
-        // preparar elementos
-      const Img = document.createElement("img");
-      img.setAttribute(src,"")
+        const Img = document.createElement("img");
+        Img.setAttribute("src", "");
       }
-    
-
-

@@ -56,3 +56,13 @@ export const verUnaPublicacion = async (req, res) => {
         res.status(500).send("Error interno del servidor");
     }
 };
+export const crearComentario = async (req, res) => {
+    try {
+        const { contenido } = req.body;
+        await Comentario.create({ contenido });
+        return res.redirect('back');
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send("Error al crear el comentario");
+    }
+};
