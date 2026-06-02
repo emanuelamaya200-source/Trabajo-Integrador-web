@@ -2,12 +2,7 @@ import 'dotenv/config';
 import { Sequelize } from 'sequelize';
 import pg from 'pg';
 
-const sslOptions = process.env.DB_SSL === "true" ? {
-  ssl: {
-    require: true,
-    rejectUnauthorized: false,
-  }
-} : false;
+const useSSL = process.env.DB_SSL?.trim().toLowerCase() === "true";
 
 const sequelize = new Sequelize(
   process.env.DB_NAME,
@@ -19,7 +14,14 @@ const sequelize = new Sequelize(
     dialect: 'postgres',
     dialectModule: pg,
     logging: false,
-    dialectOptions: sslOptions ? { ssl: sslOptions.ssl } : {}
+    dialectOptions: useSSL 
+      ? {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          }
+        }
+      : {}
   }
 );
 
