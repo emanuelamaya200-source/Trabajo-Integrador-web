@@ -60,7 +60,7 @@ async function RelacionarTablas() {
 
     // Imagen y Comentario
     Imagen.hasMany(Comentario, { as: "comentarios", foreignKey: "imagen_id" });
-    Comentario.belongsTo(Imagen,{as: "imagen", foreignKey: "imagen_id" });
+    Comentario.belongsTo(Imagen, { as: "imagen", foreignKey: "imagen_id" });
 
     // Comentario y usuario
     Usuario.hasMany(Comentario, { as: "comentarios", foreignKey: "user_id" });

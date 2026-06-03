@@ -1,15 +1,17 @@
-mixin publicacion(item)
+mixin publicacion(item, comentarios) 
   div.publicacion
     div#publicacionparteuno
       if item.imagenes && item.imagenes.length > 0 
+        div#contadorImagenes(style="text-align: center; font-weight: bold; margin-bottom: 10px;") 0 / 0
+        
         div#imagenes
           div 
-            img#izquierda(src="/left.png", alt="izquierda", height="30px", onclick="cambiarImagen(-1)")
+            img#izquierda(src="/left.png", alt="izquierda", height="30px")
           div 
-            img#imagenPrincipal(src="", alt="publicacion", style="width: 200px;")
+            img#imagenPrincipal(src="", alt="publicacion")
             div#valorar promedio: 0
           div
-            img#derecha(src="/right.png", alt="derecha", height="30px", onclick="cambiarImagen(1)")
+            img#derecha(src="/right.png", alt="derecha", height="30px")
       else
         p imagen no encontrada
           
@@ -28,46 +30,95 @@ mixin publicacion(item)
       div.lista-comentarios
         h1 Comentarios
         div#cajaComentarios(style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;")
-          if item.comentarios && item.comentarios.length > 0
-            each com in item.comentarios
-              div.comentario-item(style="border-bottom: 1px solid #eee; padding: 8px 0;")
-                strong= com.usuario ? com.usuario.username : "Usuario"
-                p(style="margin: 4px 0;")= com.contenido
-          else
-            p.sin-comentarios No hay comentarios aún. Sé el primero en comentar.
 
       form(action='/crearComentario' method='POST')
         input(type='hidden' name='post_id' value=item.id)
+        input(type='hidden' id='inputImagenId' name='imagen_id' value="")
         textarea(name='contenido' placeholder='Escribe un comentario...' required)
         input(type='submit' value='Comentar')
 
     script.
-      let lista = !{JSON.stringify(item.imagenes || [])};
-      let i = 0;
+      const listaImagenes = !{JSON.stringify(item.imagenes || [])};
+      const todosLosComentarios = !{JSON.stringify(comentarios || [])};
+      let indiceImagenActual = 0;
 
-      function cargarImagen(){
-        if(lista.length == 0) return;
+      const elementoImagenPrincipal = document.querySelector('#imagenPrincipal');
+      const elementoTextoValoracion = document.querySelector('#valorar');
+      const elementoInputImagenId = document.querySelector('#inputImagenId');
+      const elementoCajaComentarios = document.querySelector('#cajaComentarios');
+      const elementoContadorImagenes = document.querySelector('#contadorImagenes');
+      
+      // Botones del carrusel
+      const botonAnterior = document.querySelector('#izquierda');
+      const botonSiguiente = document.querySelector('#derecha');
 
-        let img = document.querySelector('#imagenPrincipal');
-        let val = document.querySelector('#valorar');
+      // actualizar comentarios
+      function actualizarComentariosPorImagen(imagenId) {
+        elementoCajaComentarios.innerHTML = "";
 
-        img.setAttribute("src", lista[i].url);
-        val.innerText = "promedio: " + (lista[i].promedio || 0);
+        const comentariosFiltrados = todosLosComentarios.filter(function(comentario) {
+          return comentario.imagen_id === imagenId;
+        });
+
+        if (comentariosFiltrados.length > 0) {
+          comentariosFiltrados.forEach(function(comentario) {
+            const itemComentario = document.createElement('div');
+            itemComentario.className = 'comentario-item';
+            itemComentario.style.borderBottom = '1px solid #eee';
+            itemComentario.style.padding = '8px 0';
+
+            const etiquetaUsuario = document.createElement('strong');
+            etiquetaUsuario.textContent = comentario.usuario ? comentario.usuario.username : "Usuario";
+
+            const textoContenido = document.createElement('p');
+            textoContenido.style.margin = '4px 0';
+            textoContenido.textContent = comentario.contenido;
+
+            itemComentario.appendChild(etiquetaUsuario);
+            itemComentario.appendChild(textoContenido);
+            elementoCajaComentarios.appendChild(itemComentario);
+          });
+        } else {
+          const sinComentarios = document.createElement('p');
+          sinComentarios.className = 'sin-comentarios';
+          sinComentarios.textContent = 'No hay comentarios aún. Sé el primero en comentar.';
+          elementoCajaComentarios.appendChild(sinComentarios);
+        }
       }
 
-      function cambiarImagen(dir){
-        i = i + dir;
+      function renderizarImagenActual() {
+        if (listaImagenes.length === 0) return;
 
-        if(i < 0){
-          i = lista.length - 1;
-        }
-        if(i >= lista.length){
-          i = 0;
-        }
+        const imagenActual = listaImagenes[indiceImagenActual];
 
-        cargarImagen();
+        elementoImagenPrincipal.setAttribute("src", imagenActual.url);
+        elementoTextoValoracion.textContent = "promedio: " + (imagenActual.promedio || 0);
+        elementoInputImagenId.value = imagenActual.id;
+        elementoContadorImagenes.textContent = (indiceImagenActual + 1) + " / " + listaImagenes.length;
+
+        actualizarComentariosPorImagen(imagenActual.id);
       }
 
-      window.onload = function() {
-        cargarImagen();
+      function cambiarIndiceImagen(direccion) {
+        indiceImagenActual = indiceImagenActual + direccion;
+
+        if (indiceImagenActual < 0) {
+          indiceImagenActual = listaImagenes.length - 1;
+        }
+        if (indiceImagenActual >= listaImagenes.length) {
+          indiceImagenActual = 0;
+        }
+
+        renderizarImagenActual();
+      }
+
+      if (listaImagenes.length > 0) {
+        botonAnterior.addEventListener('click', function() {
+          cambiarIndiceImagen(-1);
+        });
+
+        botonSiguiente.addEventListener('click', function() {
+          cambiarIndiceImagen(1);
+        });
+        renderizarImagenActual();
       }

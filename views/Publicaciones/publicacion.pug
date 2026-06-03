@@ -1,13 +1,10 @@
 extends ../layout.pug
 include ../../mixins/publicacion.pug
 
-
 block estilo
 
 block content
 
-	+publicacion(objetoJSON)
+    +publicacion(objetoJSON, comentarios)
 
-	script.
-
-		
+    script.

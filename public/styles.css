@@ -97,47 +97,30 @@
 #iniciopagina{
     position: relative;
 }
-
-/*publicacion*/
+/*-----publicacion-----*/
 .publicacion {
     display: flex;
     flex-direction: row;
     width: 95vw;
-    max-width: 1200px;
+    max-width: 1400px; 
     margin: 20px auto;
-    gap: 100px;
+    gap: 30px; 
+    box-sizing: border-box;
 }
 
-#publicacionparteuno, #publicacioncomentarios {
+
+#publicacionparteuno, 
+#publicacioncomentarios {
     display: flex;
     flex-direction: column;
-    width: 50%;
-    height: 80vh;
-    padding: 20px;
+    width: 50%; 
+    height: 85vh; 
+    padding: 25px;
     border: 1px solid black;
     border-radius: 20px;
     box-sizing: border-box;
 }
 
-#publicacioncomentarios {
-    justify-content: space-between;
-}
-
-#publicacioncomentarios form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#publicacioncomentarios textarea {
-    width: 100%;
-    height: 80px;
-    resize: none;
-}
-
-#publicacioncomentarios input[type='submit'] {
-    align-self: flex-end;
-}
 
 #imagenes {
     display: flex;
@@ -145,9 +128,82 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    height: 50%;
+    height: 65%; 
+    margin-bottom: 20px;
+    background-color: #fafafa; 
+    border-radius: 12px;
+    padding: 10px;
+    box-sizing: border-box;
 }
-img #imagen{
+
+#imagenPrincipal {
+    max-width: 85%; 
+    max-height: 100%;
+    object-fit: contain; 
+    display: block;
+    margin: 0 auto;
+}
+
+#izquierda, #derecha {
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+}
+
+#izquierda:hover, #derecha:hover {
+    transform: scale(1.2);
+}
+
+#valorar {
+    text-align: center;
+    margin-top: 8px;
+    font-weight: bold;
+}
+    /*comentarios*/
+#publicacioncomentarios {
+    justify-content: space-between;
+}
+
+.lista-comentarios {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 130px); 
+}
+
+#cajaComentarios {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+#publicacioncomentarios form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+#publicacioncomentarios textarea {
+    width: 100%;
+    height: 80px;
+    resize: none;
+    box-sizing: border-box;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+#publicacioncomentarios input[type='submit'] {
+    align-self: flex-end;
+    padding: 8px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid black;
+    background-color: white;
+    transition: background 0.2s;
+}
+
+#publicacioncomentarios input[type='submit']:hover {
+    background-color: #e0e0e0;
 }
