@@ -1,7 +1,34 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../conexion.js";
 
-export class Comentario extends Model {}
+export class Comentario extends Model {
+static async crearComentario(postid, user, contenidoTexto) {
+    try {
+      const nuevoComentario = await Comentario.create({
+        imagen_id: postid,
+        user_id: user,
+        contenido: contenidoTexto
+      });
+      return nuevoComentario;
+    } catch (err) {
+      console.error("Error al insertar comentario en la BD:", err);
+      throw err; 
+    }
+  }
+static async buscarComentarios(idpost) {
+  try {
+    const comentarios = await Comentario.findAll({
+      where: {
+        imagen_id: idpost
+      },
+      include: [{ model: Usuario, as: "usuario" }] 
+    });
+    return comentarios;
+  } catch (error) {
+    console.error("Error al buscar comentarios:", error);
+  }
+}
+}
 
 Comentario.init(
   {
@@ -11,13 +38,21 @@ Comentario.init(
       primaryKey: true,
       allowNull: false,
     },
-    post_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+    imagen_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false, 
+    references: {    
+      model: 'imagenes', 
+      key: 'id'         
+    }
     },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: 'usuarios', 
+        key: 'id'
+      }
     },
     fecha: {
       type: DataTypes.DATE,

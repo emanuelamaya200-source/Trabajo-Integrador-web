@@ -54,13 +54,17 @@ async function RelacionarTablas() {
     Publicacion.hasMany(Denuncia_publicacion, { foreignKey: "publicacion_id" });
     Denuncia_publicacion.belongsTo(Publicacion, { foreignKey: "publicacion_id" });
     
-    // >>> Arreglado con post_id <<<
+    // Publicacion y imagen
     Publicacion.hasMany(Imagen, { as: "imagenes", foreignKey: "post_id" });
     Imagen.belongsTo(Publicacion, { foreignKey: "post_id" });
 
     // Imagen y Comentario
     Imagen.hasMany(Comentario, { as: "comentarios", foreignKey: "imagen_id" });
-    Comentario.belongsTo(Imagen, { foreignKey: "imagen_id" });
+    Comentario.belongsTo(Imagen,{as: "imagen", foreignKey: "imagen_id" });
+
+    // Comentario y usuario
+    Usuario.hasMany(Comentario, { as: "comentarios", foreignKey: "user_id" });
+    Comentario.belongsTo(Usuario, { as: "usuario", foreignKey: "user_id" });
     
     // Etiquetas
     Publicacion.belongsToMany(Etiqueta, { 

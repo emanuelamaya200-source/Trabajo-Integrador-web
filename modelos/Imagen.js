@@ -5,7 +5,7 @@ export class Imagen extends Model {
   static async crearImagen(post, purl, pcopyright, plicencia) {
     try {
       const Ima = Imagen.build({            
-        post_id: post, // Modificado
+        post_id: post,
         url: purl,
         licencia: plicencia,
         copyrigth: pcopyright,

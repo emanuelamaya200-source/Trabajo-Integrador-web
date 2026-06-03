@@ -1,9 +1,10 @@
-import { Model,DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../conexion.js";
 import { Etiqueta } from "./Etiqueta.js";
-import { Op } from "sequelize"
+import { Op } from "sequelize";
 import { Imagen } from "./Imagen.js";
-import {Comentario} from "./Comentario.js"
+import { Comentario } from "./Comentario.js";
+import { Usuario } from "./Usuario.js";
  
 export class Publicacion extends Model {
       
@@ -14,12 +15,14 @@ export class Publicacion extends Model {
         descripcion: pdescripcion,
       });
       
-      for (const nombreEtiqueta of etiquetas) {
-        const [etiqueta] = await Etiqueta.findOrCreate({
-          where: { nombre: nombreEtiqueta }
-        });
+      if (etiquetas && etiquetas.length > 0) {
+        for (const nombreEtiqueta of etiquetas) {
+          const [etiqueta] = await Etiqueta.findOrCreate({
+            where: { nombre: nombreEtiqueta }
+          });
 
-        await publi.addEtiqueta(etiqueta); 
+          await publi.addEtiqueta(etiqueta); 
+        }
       }
       
       return publi;
@@ -28,84 +31,81 @@ export class Publicacion extends Model {
       console.log("Error al crear publicacion:", err);
     }
   }
-static async buscarPublicacionesTodo(todo) {
-  try {
-    const publicacionesCoincidentes = await Publicacion.findAll({
-      attributes: ['id'], 
-      where: {
-        [Op.or]: [
-          { titulo: { [Op.like]: `%${todo}%` } },
-          { descripcion: { [Op.like]: `%${todo}%` } },
-          { '$etiquetas.nombre$': { [Op.like]: `%${todo}%` } } 
-        ]
-      },
-      include: [
-        { 
-          model: Etiqueta, 
-          as: 'etiquetas', 
-          attributes: [], 
-          through: { attributes: [] } 
-        }
-      ],
-      subQuery: false,
-      raw: true 
-    });
 
-    const ids = publicacionesCoincidentes.map(p => p.id);
-
-    if (ids.length === 0) {
-      return { cantidad: 0, fila: [] };
-    }
-
-    const { count, rows } = await Publicacion.findAndCountAll({
-      where: {
-        id: { [Op.in]: ids } 
-      },
-      include: [
-        { model: Imagen, as: 'imagenes' },
-        { model: Etiqueta, as: 'etiquetas' }
-      ],
-      distinct: true
-    });
-
-    return { cantidad: count, fila: rows };
-  } catch (err) {
-    console.error("Error en el motor de búsqueda de 2 pasos:", err);
-    throw err;
-  }
-}
-
-
-static async buscarUnaPublicacion(id) {
-  try {
-    const publi = await Publicacion.findByPk(id, {
-      include: [
-        {
-          model: Imagen,
-          as: "imagenes",
-          // una inclusion dentro de otra inclusion se hace igual con el include
-          include: [
-            {
-              model: Comentario,
-              as: "comentarios"
-            }
+  static async buscarPublicacionesTodo(todo) {
+    try {
+      const publicacionesCoincidentes = await Publicacion.findAll({
+        attributes: ['id'], 
+        where: {
+          [Op.or]: [
+            { titulo: { [Op.like]: `%${todo}%` } },
+            { descripcion: { [Op.like]: `%${todo}%` } },
+            { '$etiquetas.nombre$': { [Op.like]: `%${todo}%` } } 
           ]
         },
-        {
-          model: Etiqueta,
-          as: "etiquetas"
-        }
-      ]
-    });
-    return publi;
-  } catch (err) {
-    console.log("error, no existe o no funcionó esa primary key", err);
-    throw err;
+        include: [
+          { 
+            model: Etiqueta, 
+            as: 'etiquetas', 
+            attributes: [], 
+            through: { attributes: [] } 
+          }
+        ],
+        subQuery: false,
+        raw: true 
+      });
+
+      const ids = publicacionesCoincidentes.map(p => p.id);
+
+      if (ids.length === 0) {
+        return { cantidad: 0, fila: [] };
+      }
+
+      const { count, rows } = await Publicacion.findAndCountAll({
+        where: {
+          id: { [Op.in]: ids } 
+        },
+        include: [
+          { model: Imagen, as: 'imagenes' },
+          { model: Etiqueta, as: 'etiquetas' }
+        ],
+        distinct: true
+      });
+
+      return { cantidad: count, fila: rows };
+    } catch (err) {
+      console.error("Error en el motor de búsqueda de 2 pasos:", err);
+      throw err;
+    }
+  }
+
+  static async buscarUnaPublicacion(id) {
+    try {
+      const publi = await Publicacion.findByPk(id, {
+        include: [
+          {
+            model: Imagen,
+            as: "imagenes",
+            include: [
+              {
+                model: Comentario,
+                as: "comentarios"
+              }
+            ]
+          },
+          {
+            model: Etiqueta,
+            as: "etiquetas"
+          }
+        ]
+      });
+      return publi;
+    } catch (err) {
+      console.log("error, no existe o no funcionó esa primary key", err);
+      throw err;
+    }
   }
 }
-
-}
-
 
 Publicacion.init(
   {
@@ -114,6 +114,14 @@ Publicacion.init(
       autoIncrement: true,
       primaryKey: true,
       allowNull: false,
+    },
+    usuario_id: { 
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'usuarios',
+        key: 'id'
+      }
     },
     estado: {
       type: DataTypes.BOOLEAN,
@@ -131,21 +139,23 @@ Publicacion.init(
     comentarios_permitidos: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
+      defaultValue: true,
     },
     cantidad_denuncias: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 0,
     },
     cantidad_valoraciones: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      defaultValue: 0,
     },
     promedio_valoraciones: {
       type: DataTypes.FLOAT,
       allowNull: true,
+      defaultValue: 0.0,
     },
-    
-
   },
   {
     sequelize, 
