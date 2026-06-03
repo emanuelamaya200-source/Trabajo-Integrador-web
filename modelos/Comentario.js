@@ -4,19 +4,19 @@ import { Usuario } from "./Usuario.js";
 
 export class Comentario extends Model {
   
-  static async crearComentario(imagenid, user, contenidoTexto) {
+static async crearComentario(imagenId, usuarioId, contenidoTexto) {
     try {
-      const nuevoComentario = await Comentario.create({
-        imagen_id: imagenid,
-        user_id: user,
-        contenido: contenidoTexto
-      });
-      return nuevoComentario;
+        const nuevoComentario = await Comentario.create({
+            imagen_id: imagenId,
+            user_id: usuarioId,
+            contenido: contenidoTexto
+        });
+        return nuevoComentario;
     } catch (err) {
-      console.error("Error al insertar comentario en la BD:", err);
-      throw err; 
+        console.error("Error de inserción en la base de datos (Comentario):", err);
+        throw err; 
     }
-  }
+}
 
   static async buscarComentarios(idImagen) {
     try {

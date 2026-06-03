@@ -43,35 +43,19 @@ export const buscarPublicaciones = async (req, res) => {
 export const verUnaPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
-        
         const publicacion = await Publicacion.buscarUnaPublicacion(id);
 
         if (!publicacion) {
             return res.status(404).send("Publicación no encontrada");
         }
-
+        const prettyString = JSON.stringify(publicacion, null, 2);
         const publicacionJSON = publicacion.toJSON();
-        let listaComentarios = [];
-
-        if (publicacionJSON.imagenes && publicacionJSON.imagenes.length > 0) {
-            
-            const promesasComentarios = publicacionJSON.imagenes.map(imagen => 
-                Comentario.buscarComentarios(imagen.id)
-            );
-
-            const resultadosMetodo = await Promise.all(promesasComentarios);
-            listaComentarios = resultadosMetodo
-                .filter(resultado => resultado && resultado.length > 0) 
-                .flatMap(comentariosPorImagen => 
-                    comentariosPorImagen.map(comentario => comentario.toJSON())
-                );
+        if (!publicacionJSON.imagenes || publicacionJSON.imagenes.length === 0) {
+            return res.render("Publicaciones/publicacion", {publicacionJSON});
         }
-
-        console.log(`--- COMENTARIOS TOTALES CARGADOS (${listaComentarios.length}) ---`);
-
-        return res.render("Publicaciones/publicacion", { 
-            objetoJSON: publicacionJSON, 
-            comentarios: listaComentarios 
+        console.log(prettyString);
+        return res.render("Publicaciones/publicacion", {   
+            objetoJSON: publicacionJSON
         });
 
     } catch (err) {
@@ -81,19 +65,20 @@ export const verUnaPublicacion = async (req, res) => {
 };
 
 export const crearComentario = async (req, res) => {
-    let {post_id, imagen_id }= req.body; 
-    try {
-        const { contenido } = req.body;
-        const user_id = req.session.usuario.id;
-        
-        await Comentario.crearComentario(imagen_id, user_id, contenido);
+    const { post_id, imagen_id, contenido } = req.body; 
 
+    try {
+        if (!req.session || !req.session.usuario) {
+            return res.status(401).send("Debes iniciar sesión para comentar");
+        }
+        const usuarioId = req.session.usuario.id;
+        await Comentario.crearComentario(imagen_id, usuarioId, contenido);
         return res.redirect(`/verPublicacion/${post_id}`);
     } catch (error) {
-        console.error("Error en el controlador crearComentario:", error);
+        console.error("Error crítico en el controlador crearComentario:", error);
         if (post_id) {
             return res.redirect(`/verPublicacion/${post_id}`);
-        }
-        return res.redirect('back');
+        }      
+        return res.redirect("/");
     }
 };

@@ -1,4 +1,4 @@
-mixin publicacion(item, comentarios) 
+mixin publicacion(item) 
   div.publicacion
     div#publicacionparteuno
       if item.imagenes && item.imagenes.length > 0 
@@ -12,6 +12,9 @@ mixin publicacion(item, comentarios)
             div#valorar promedio: 0
           div
             img#derecha(src="/right.png", alt="derecha", height="30px")
+        div#caracteristicas
+          p#promedio
+          p#copyright
       else
         p imagen no encontrada
           
@@ -39,86 +42,77 @@ mixin publicacion(item, comentarios)
 
     script.
       const listaImagenes = !{JSON.stringify(item.imagenes || [])};
-      const todosLosComentarios = !{JSON.stringify(comentarios || [])};
       let indiceImagenActual = 0;
 
-      const elementoImagenPrincipal = document.querySelector('#imagenPrincipal');
-      const elementoTextoValoracion = document.querySelector('#valorar');
-      const elementoInputImagenId = document.querySelector('#inputImagenId');
-      const elementoCajaComentarios = document.querySelector('#cajaComentarios');
-      const elementoContadorImagenes = document.querySelector('#contadorImagenes');
-      
-      // Botones del carrusel
-      const botonAnterior = document.querySelector('#izquierda');
-      const botonSiguiente = document.querySelector('#derecha');
+      const botonDerecha = document.querySelector("#derecha");
+      const botonIzquierda = document.querySelector("#izquierda");
 
-      // actualizar comentarios
-      function actualizarComentariosPorImagen(imagenId) {
+      const elementoImagen = document.querySelector("#imagenPrincipal");
+      const elementoPromedio = document.querySelector("#promedio");
+      const elementoContador = document.querySelector("#contadorImagenes");
+      const elementoInputImagenId = document.querySelector("#inputImagenId");
+      const elementoCajaComentarios = document.querySelector("#cajaComentarios");
+
+      function cargarImagen() {
+        if (listaImagenes.length === 0) return;
+
+        const imagenActiva = listaImagenes[indiceImagenActual];
+
+        elementoImagen.setAttribute("src", imagenActiva.url);
+        elementoPromedio.textContent = "Promedio: " + (imagenActiva.promedio || 0);
+        elementoInputImagenId.value = imagenActiva.id;
+        elementoContador.textContent = (indiceImagenActual + 1) + " / " + listaImagenes.length;
+      }
+
+      function cargarComentarios() {
+        if (listaImagenes.length === 0) return;
+
         elementoCajaComentarios.innerHTML = "";
+        const comentarios = listaImagenes[indiceImagenActual].comentarios || [];
 
-        const comentariosFiltrados = todosLosComentarios.filter(function(comentario) {
-          return comentario.imagen_id === imagenId;
-        });
+        if (comentarios.length > 0) {
+          comentarios.forEach(function(comentario) {
+            const contenedorComentario = document.createElement("div");
+            contenedorComentario.style.borderBottom = "1px solid #eee";
+            contenedorComentario.style.padding = "8px 0";
 
-        if (comentariosFiltrados.length > 0) {
-          comentariosFiltrados.forEach(function(comentario) {
-            const itemComentario = document.createElement('div');
-            itemComentario.className = 'comentario-item';
-            itemComentario.style.borderBottom = '1px solid #eee';
-            itemComentario.style.padding = '8px 0';
-
-            const etiquetaUsuario = document.createElement('strong');
+            const etiquetaUsuario = document.createElement("strong");
             etiquetaUsuario.textContent = comentario.usuario ? comentario.usuario.username : "Usuario";
 
-            const textoContenido = document.createElement('p');
-            textoContenido.style.margin = '4px 0';
+            const textoContenido = document.createElement("p");
+            textoContenido.style.margin = "4px 0";
             textoContenido.textContent = comentario.contenido;
 
-            itemComentario.appendChild(etiquetaUsuario);
-            itemComentario.appendChild(textoContenido);
-            elementoCajaComentarios.appendChild(itemComentario);
+            contenedorComentario.appendChild(etiquetaUsuario);
+            contenedorComentario.appendChild(textoContenido);
+            elementoCajaComentarios.appendChild(contenedorComentario);
           });
         } else {
-          const sinComentarios = document.createElement('p');
-          sinComentarios.className = 'sin-comentarios';
-          sinComentarios.textContent = 'No hay comentarios aún. Sé el primero en comentar.';
+          const sinComentarios = document.createElement("p");
+          sinComentarios.textContent = "No hay comentarios aún.";
           elementoCajaComentarios.appendChild(sinComentarios);
         }
       }
 
-      function renderizarImagenActual() {
-        if (listaImagenes.length === 0) return;
-
-        const imagenActual = listaImagenes[indiceImagenActual];
-
-        elementoImagenPrincipal.setAttribute("src", imagenActual.url);
-        elementoTextoValoracion.textContent = "promedio: " + (imagenActual.promedio || 0);
-        elementoInputImagenId.value = imagenActual.id;
-        elementoContadorImagenes.textContent = (indiceImagenActual + 1) + " / " + listaImagenes.length;
-
-        actualizarComentariosPorImagen(imagenActual.id);
-      }
-
-      function cambiarIndiceImagen(direccion) {
-        indiceImagenActual = indiceImagenActual + direccion;
-
-        if (indiceImagenActual < 0) {
-          indiceImagenActual = listaImagenes.length - 1;
-        }
-        if (indiceImagenActual >= listaImagenes.length) {
-          indiceImagenActual = 0;
-        }
-
-        renderizarImagenActual();
-      }
-
       if (listaImagenes.length > 0) {
-        botonAnterior.addEventListener('click', function() {
-          cambiarIndiceImagen(-1);
+        botonIzquierda.addEventListener("click", function() {
+          indiceImagenActual--;
+          if (indiceImagenActual < 0) {
+            indiceImagenActual = listaImagenes.length - 1;
+          }
+          cargarImagen();
+          cargarComentarios();
         });
 
-        botonSiguiente.addEventListener('click', function() {
-          cambiarIndiceImagen(1);
+        botonDerecha.addEventListener("click", function() {
+          indiceImagenActual++;
+          if (indiceImagenActual >= listaImagenes.length) {
+            indiceImagenActual = 0;
+          }
+          cargarImagen();
+          cargarComentarios();
         });
-        renderizarImagenActual();
+
+        cargarImagen();
+        cargarComentarios();
       }

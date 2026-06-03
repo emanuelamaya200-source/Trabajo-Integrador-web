@@ -79,32 +79,38 @@ export class Publicacion extends Model {
     }
   }
 
-  static async buscarUnaPublicacion(id) {
-    try {
-      const publi = await Publicacion.findByPk(id, {
-        include: [
-          {
-            model: Imagen,
-            as: "imagenes",
-            include: [
-              {
-                model: Comentario,
-                as: "comentarios"
-              }
-            ]
-          },
-          {
-            model: Etiqueta,
-            as: "etiquetas"
-          }
-        ]
-      });
-      return publi;
-    } catch (err) {
-      console.log("error, no existe o no funcionó esa primary key", err);
-      throw err;
-    }
+static async buscarUnaPublicacion(id) {
+  try {
+    const publicacion = await Publicacion.findByPk(id, {
+      include: [
+        {
+          model: Imagen,
+          as: "imagenes",
+          include: [
+            {
+              model: Comentario,
+              as: "comentarios", 
+              include: [
+                {
+                  model: Usuario,
+                  as: "usuario" 
+                }
+              ]
+            }
+          ]
+        },
+        {
+          model: Etiqueta,
+          as: "etiquetas"
+        }
+      ]
+    });
+    return publicacion;
+  } catch (err) {
+    console.error("Error al buscar la publicación por PK:", err);
+    throw err;
   }
+}
 }
 
 Publicacion.init(
