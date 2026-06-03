@@ -1,21 +1,21 @@
-import { Model,  DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../conexion.js";
 
 export class Imagen extends Model {
-    static async crearImagen(post , purl ,pcopyright, plicencia){
-        try {
-            const Ima = Imagen.build({             
-            publicacion_id : post,
-            url: purl,
-            licencia: plicencia,
-            copyrigth: pcopyright,
-        })
-        await Ima.save();
-        return Ima;
-        }
-        catch(err){console.log(err)}  
+  static async crearImagen(post, purl, pcopyright, plicencia) {
+    try {
+      const Ima = Imagen.build({            
+        post_id: post, // Modificado
+        url: purl,
+        licencia: plicencia,
+        copyrigth: pcopyright,
+      });
+      await Ima.save();
+      return Ima;
     }
+    catch (err) { console.log(err); }  
   }
+}
 
 Imagen.init({
   id: {
@@ -23,10 +23,11 @@ Imagen.init({
     autoIncrement: true,
     primaryKey: true,
     allowNull: false,
-  },publicacion_id:{
+  },
+  post_id: { 
     type: DataTypes.INTEGER,
     allowNull: false,
-    references:{
+    references: {
       model: 'publicaciones',
       key: 'id'
     }

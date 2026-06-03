@@ -2,39 +2,44 @@ extends ../layout
 
 block estilo 
     style.
-            #iniciopagina {
-                position: relative;
-                height: 85vh;
-                width: 95%;
-                display: flex;
-            }
-            #iniciopagina::before {
-                content: "";
-                position: absolute;
-                inset: 0;
-                z-index: -1;
-                background: url('/iniciofv.png') no-repeat center;
-                background-size: contain;
-            }
-            form {
-                display: flex; 
-                flex-direction: column;
-                position: absolute;
-                gap: 10px; 
-                width: 300px; 
-                right: 10%; 
-                top: 30%;
-            }
+        #iniciopagina {
+            position: relative;
+            height: 85vh;
+            width: 95%;
+            display: flex;
+        }
+        #iniciopagina::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: url('/iniciofv.png') no-repeat center;
+            background-size: contain;
+        }
+        form {
+            display: flex; 
+            flex-direction: column;
+            position: absolute;
+            gap: 10px; 
+            width: 300px; 
+            right: 10%; 
+            top: 30%;
+        }
+
+block mensajes
+    div#mensajeslogin
+        if mensajes
+            p= mensajes
 
 block content 
     div#iniciopagina 
-        form(action='/login' method='POST')
+        form(action='/unirse' method='POST')
             h3 Iniciar Sesion
 
-            label(for='email') Email
-            input#email(type='email' name='email')
+            label(for='campo') Email o Usuario
+            input#campo(type='text' name='campo' required)
 
-            label(for='contrasena') Contraseña
-            input#contrasena(type='password' name='contrasena')
+            label(for='contrasenia') Contraseña
+            input#contrasenia(type='password' name='contrasenia' required)
 
             input(type='submit' value='Iniciar')

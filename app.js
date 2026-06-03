@@ -1,13 +1,13 @@
 import 'dotenv/config';
 import express from 'express';
+import session from 'express-session';
 import pug from 'pug';
 import { sequelize, conectar } from './conexion.js';
 import { Sincronizar } from './sync.js';
 // routers
 import Publicaciones from"./rutas/Publicaciones.js"
 import RegYLogin from"./rutas/RegYLogin.js"
-
-
+import { requireAuth } from './controller/autenticador.js';
 
 // CONSTANTES
 const PORT = process.env.PORT;
@@ -22,7 +22,20 @@ await Sincronizar();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+app.use(session({
+    secret: 'clave-secreta-larga',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24
+    }
+}));
 
+app.use((req, res, next) => {
+    res.locals.usuario = req.session.usuario || null;
+    next();
+});
 
 //cargar pug
 app.set("view engine", "pug");

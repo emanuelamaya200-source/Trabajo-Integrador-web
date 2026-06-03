@@ -1,5 +1,6 @@
 import Publicacion from '../modelos/Publicacion.js';
 import { Imagen } from '../modelos/Imagen.js';
+import { Comentario } from '../modelos/Comentario.js';
 
 export const mostrarFormulario = (req, res) => {
     res.render("Publicaciones/crearPubli");
@@ -54,5 +55,26 @@ export const verUnaPublicacion = async (req, res) => {
     } catch (err) {
         console.error("Error al cargar la publicación:", err);
         res.status(500).send("Error interno del servidor");
+    }
+};
+export const crearComentario = async (req, res) => {
+    let post_id = req.body.post_id; 
+    try {
+        const { contenido } = req.body;
+        const user_id = req.session.usuario.id;
+
+        await Comentario.create({ 
+            contenido, 
+            post_id, 
+            user_id 
+        });
+
+        return res.redirect(`/verPublicacion/${post_id}`);
+    } catch (error) {
+        console.error(error);
+        if (post_id) {
+            return res.redirect(`/verPublicacion/${post_id}`);
+        }
+        return res.redirect('back');
     }
 };

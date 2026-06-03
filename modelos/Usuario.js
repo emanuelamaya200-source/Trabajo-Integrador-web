@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../conexion.js';
+import { Op } from "sequelize"
 
 export class Usuario extends Model {
     
@@ -26,6 +27,21 @@ export class Usuario extends Model {
         }
         catch(err){console.log(err)}  
     }
+        static async buscarPorNombreOEmail(contenido) {
+            try {
+                return await Usuario.findOne({
+                    where: {
+                        [Op.or]: [
+                            { username: { [Op.like]: contenido } },
+                            { email: { [Op.like]: contenido } }
+                        ]
+                    }
+                });
+            } catch (error) {
+                console.error(error);
+                return null;
+            }
+        }
 }
 
 Usuario.init(

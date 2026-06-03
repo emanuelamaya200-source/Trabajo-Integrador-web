@@ -85,17 +85,69 @@
 .apilarimagenes li {
     flex-shrink: 0;  
 }
-.publicacion{
-    margin: auto;
-    padding: auto;
+/*login*/
+#mensajeslogin p {
+    font-size: 30px;
+    background-color: #000000;
+    color: red;
+    position: absolute;
+    bottom: 0%;
+    right: 50%;
+}
+#iniciopagina{
+    position: relative;
+}
+
+/*publicacion*/
+.publicacion {
     display: flex;
     flex-direction: row;
+    width: 95vw;
+    max-width: 1200px;
+    margin: 20px auto;
+    gap: 100px;
 }
-#publicacionparteuno,#publicacioncomentarios {
+
+#publicacionparteuno, #publicacioncomentarios {
     display: flex;
     flex-direction: column;
-    margin:auto;
-    padding: auto;
+    width: 50%;
+    height: 80vh;
+    padding: 20px;
     border: 1px solid black;
     border-radius: 20px;
+    box-sizing: border-box;
+}
+
+#publicacioncomentarios {
+    justify-content: space-between;
+}
+
+#publicacioncomentarios form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#publicacioncomentarios textarea {
+    width: 100%;
+    height: 80px;
+    resize: none;
+}
+
+#publicacioncomentarios input[type='submit'] {
+    align-self: flex-end;
+}
+
+#imagenes {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 50%;
+}
+img #imagen{
+    width: 100%;
+    height: 100%;
 }

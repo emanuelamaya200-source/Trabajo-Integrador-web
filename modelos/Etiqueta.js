@@ -5,7 +5,7 @@ import { Publicacion } from "./Publicacion.js";
 export class Etiqueta extends Model { 
 
 }
-
+//prueba comentario
 
 Etiqueta.init(
   {

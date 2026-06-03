@@ -1,5 +1,5 @@
-import { Model,DataTypes } from "sequelize";
-import {sequelize} from "../conexion.js";
+import { Model, DataTypes } from "sequelize";
+import { sequelize } from "../conexion.js";
 
 export class Comentario extends Model {}
 
@@ -11,7 +11,6 @@ Comentario.init(
       primaryKey: true,
       allowNull: false,
     },
-    // Model attributes are defined here
     post_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -23,6 +22,7 @@ Comentario.init(
     fecha: {
       type: DataTypes.DATE,
       allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     contenido: {
       type: DataTypes.STRING(255),
@@ -30,12 +30,9 @@ Comentario.init(
     },
   },
   {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
-    modelName: 'comentario', // We need to choose the model name
+    sequelize,
+    modelName: 'comentario',
     tableName: 'comentarios',
-    createdAt: true,
-    deletedAt: true,
-    updatedAt: true,
-  },
+    timestamps: true,
+  }
 );
