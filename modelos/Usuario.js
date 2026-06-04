@@ -90,5 +90,6 @@ Usuario.init(
     {
         sequelize,
         modelName: 'Usuario',
+        tableName: 'usuarios'
     }
 );

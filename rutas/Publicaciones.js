@@ -17,4 +17,7 @@ router.get("/verPublicacion/:id", controller.verUnaPublicacion);
 //crear comentario
 router.post("/crearComentario", requireAuth, controller.crearComentario);
 
+//crear valoracion
+router.post("/crearValoracion",requireAuth,controller.crearValoracion)
+
 export default router;
