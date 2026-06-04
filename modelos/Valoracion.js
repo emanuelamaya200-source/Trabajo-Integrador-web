@@ -1,6 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../conexion.js";
 import { Imagen } from "./Imagen.js";
+import { Usuario } from "./Usuario.js";
 
 export class Valoracion extends Model {
 
@@ -26,6 +27,25 @@ static async crearValoracion(idimagen, userid, ppuntaje) {
     throw err;
   }
 }
+static async buscarValorisaciones(idimagen) {
+  try {   
+    const resultado = await Valoracion.findAll({
+      where: {
+        imagen_id: idimagen
+      },
+      include: [
+        {
+          model: Usuario,
+          as: "usuario"
+        }
+      ]
+    });
+    return resultado;
+  } catch (error) {
+    console.error("Error al buscar valoraciones:", error);
+    throw error; 
+  }
+}
 }
 
 Valoracion.init(
@@ -47,6 +67,10 @@ Valoracion.init(
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references:{
+        model: Usuario,
+        key: "id"
+      }
     },
     puntaje: {
       type: DataTypes.INTEGER,

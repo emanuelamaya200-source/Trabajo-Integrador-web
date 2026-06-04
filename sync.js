@@ -65,6 +65,9 @@ async function RelacionarTablas() {
     // Comentario y usuario
     Usuario.hasMany(Comentario, { as: "comentarios", foreignKey: "user_id" });
     Comentario.belongsTo(Usuario, { as: "usuario", foreignKey: "user_id" });
+
+    Usuario.hasMany(Valoracion, { as: "valoraciones", foreignKey: "user_id" });
+    Valoracion.belongsTo(Usuario, { as: "usuario", foreignKey: "user_id" });
     
     // Etiquetas
     Publicacion.belongsToMany(Etiqueta, { 

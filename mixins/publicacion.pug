@@ -2,25 +2,21 @@ mixin publicacion(item)
   div.publicacion
     div#publicacionparteuno
       if item.imagenes && item.imagenes.length > 0 
-        div#contadorImagenes(style="text-align: center; font-weight: bold; margin-bottom: 10px;") 0 / 0
-        
+        div#contadorImagenes 0 / 0
         div#imagenes
-          div 
-            img#izquierda(src="/left.png", alt="izquierda", height="30px")
-          div 
-            img#imagenPrincipal(src="", alt="publicacion")
-            div#bloqueValorar.fila
-              form(action="/crearValoracion" method="POST")
-                input#inputImagenId2(type='hidden' name='imagen_id' value="")
-                input#valordevalorar(type="range", min="1" , max="10", value="5" name="valor")
-                input(type='hidden' name='post_id' value=item.id)
-                p#valorTexto Valor: 5
-                input(type="submit" value="Valorar")
-          div
-            img#derecha(src="/right.png", alt="derecha", height="30px")
+          img#izquierda(src="/left.png" height="30px")
+          img#imagenPrincipal(src="")
+          img#derecha(src="/right.png" height="30px")
         div#caracteristicas
-          p#promedio
+          p#promedio Promedio: 0
           p#copyright
+          div#bloqueValorar
+            form(action="/crearValoracion" method="POST")
+              input#inputImagenId2(type='hidden' name='imagen_id' value="")
+              input#valordevalorar(type="range" min="1" max="10" value="5" name="valor")
+              input(type='hidden' name='post_id' value=item.id)
+              p#valorTexto Valor: 5
+              input(type="submit" value="Valorar")
       else
         p imagen no encontrada
           
@@ -28,113 +24,84 @@ mixin publicacion(item)
       p= item.descripcion
 
       if item.etiquetas && item.etiquetas.length > 0
-        div 
-          ul
-            each etiqueta in item.etiquetas
-              li= etiqueta.nombre
-      else
-        p.sin-etiquetas Sin etiquetas
+        ul
+          each etq in item.etiquetas
+            li= etq.nombre
 
     div#publicacioncomentarios
-      div.lista-comentarios
+      div
         h1 Comentarios
-        div#cajaComentarios(style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;")
+        div#cajaComentarios
 
       form(action='/crearComentario' method='POST')
         input(type='hidden' name='post_id' value=item.id)
         input#inputImagenId(type='hidden' name='imagen_id' value="")
-        textarea(name='contenido' placeholder='Escribe un comentario...' required)
+        textarea(name='contenido' required placeholder="Escribe un comentario...")
         input(type='submit' value='Comentar')
 
     script.
-      const listaImagenes = !{JSON.stringify(item.imagenes || [])};
-      let indiceImagenActual = 0;
+      const imagenes = !{JSON.stringify(item.imagenes || [])};
+      let index = 0;
 
-      const botonDerecha = document.querySelector("#derecha");
-      const botonIzquierda = document.querySelector("#izquierda");
+      const btnDerecha = document.querySelector("#derecha");
+      const btnIzquierda = document.querySelector("#izquierda");
+      const rangevoto = document.querySelector("#valordevalorar");
+      const txtvoto = document.querySelector("#valorTexto");
+      const elImagen = document.querySelector("#imagenPrincipal");
+      const elPromedio = document.querySelector("#promedio");
+      const elContador = document.querySelector("#contadorImagenes");
+      const cajaCmts = document.querySelector("#cajaComentarios");
+      // Selecciona los dos inputs ocultos de los ID de imagen a la vez
+      const inputsId = document.querySelectorAll("#inputImagenId, #inputImagenId2");
 
-      const valordevalorar = document.querySelector("#valordevalorar");
-      const valorTexto = document.querySelector("#valorTexto");
-
-      const elementoImagen = document.querySelector("#imagenPrincipal");
-      const elementoPromedio = document.querySelector("#promedio");
-      const elementoContador = document.querySelector("#contadorImagenes");
-      const elementoInputImagenId = document.querySelector("#inputImagenId");
-      const elementoInputImagenId2 = document.querySelector("#inputImagenId2");
-      const elementoCajaComentarios = document.querySelector("#cajaComentarios");
-
-      if (valordevalorar) {
-        valordevalorar.addEventListener("input", function() {
-          valorTexto.textContent = "Valor: " + valordevalorar.value;
-        });
+      if (rangevoto) {
+        rangevoto.addEventListener("input", () => txtvoto.textContent = `Valor: ${rangevoto.value}`);
       }
 
-      function cargarImagen() {
-        if (listaImagenes.length === 0) return;
+      function cargarDatos() {
+        if (!imagenes.length) return;
+        const img = imagenes[index];
 
-        const imagenActiva = listaImagenes[indiceImagenActual];
-
-        elementoImagen.setAttribute("src", imagenActiva.url);
-        elementoPromedio.textContent = "Promedio: " + (imagenActiva.promedio || 0);
-        elementoInputImagenId.value = imagenActiva.id;
-        elementoInputImagenId2.value = imagenActiva.id;
-        elementoContador.textContent = (indiceImagenActual + 1) + " / " + listaImagenes.length;
+        elImagen.src = img.url;
+        elContador.textContent = `${index + 1} / ${imagenes.length}`;
+        inputsId.forEach(input => input.value = img.id);
         
-        if (valordevalorar) {
-          valordevalorar.value = 5;
-          valorTexto.textContent = "Valor: 5";
+        
+        const votos = img.valoraciones || [];
+        let suma = 0;
+
+        // Recorremos los votos y los sumamos uno a uno
+        for (const v of votos) {
+            suma += Number(v.puntaje);
         }
+
+        // Calculamos el promedio dividiendo por la cantidad (si hay votos)
+        let promedio = 0;
+        if (votos.length > 0) {
+            promedio = (suma / votos.length).toFixed(1);
+        }
+
+        elPromedio.textContent = `Promedio: ${promedio}`;
+        
+        if (rangevoto) {
+          rangevoto.value = 5;
+          txtvoto.textContent = "Valor: 5";
+        }
+
+        const comentarios = img.comentarios || [];
+        cajaCmts.innerHTML = comentarios.length 
+          ? comentarios.map(c => `<div><strong>${c.usuario ? c.usuario.username : "Usuario"}</strong><p>${c.contenido}</p></div>`).join("")
+          : "<p>No hay comentarios aún.</p>";
       }
 
-      function cargarComentarios() {
-        if (listaImagenes.length === 0) return;
-
-        elementoCajaComentarios.innerHTML = "";
-        const comentarios = listaImagenes[indiceImagenActual].comentarios || [];
-
-        if (comentarios.length > 0) {
-          comentarios.forEach(function(comentario) {
-            const contenedorComentario = document.createElement("div");
-            contenedorComentario.style.borderBottom = "1px solid #eee";
-            contenedorComentario.style.padding = "8px 0";
-
-            const etiquetaUsuario = document.createElement("strong");
-            etiquetaUsuario.textContent = comentario.usuario ? comentario.usuario.username : "Usuario";
-
-            const textoContenido = document.createElement("p");
-            textoContenido.style.margin = "4px 0";
-            textoContenido.textContent = comentario.contenido;
-
-            contenedorComentario.appendChild(etiquetaUsuario);
-            contenedorComentario.appendChild(textoContenido);
-            elementoCajaComentarios.appendChild(contenedorComentario);
-          });
-        } else {
-          const sinComentarios = document.createElement("p");
-          sinComentarios.textContent = "No hay comentarios aún.";
-          elementoCajaComentarios.appendChild(sinComentarios);
-        }
-      }
-
-      if (listaImagenes.length > 0) {
-        botonIzquierda.addEventListener("click", function() {
-          indiceImagenActual--;
-          if (indiceImagenActual < 0) {
-            indiceImagenActual = listaImagenes.length - 1;
-          }
-          cargarImagen();
-          cargarComentarios();
+      if (imagenes.length) {
+        btnIzquierda.addEventListener("click", () => {
+          index = (index - 1 + imagenes.length) % imagenes.length;
+          cargarDatos();
         });
-
-        botonDerecha.addEventListener("click", function() {
-          indiceImagenActual++;
-          if (indiceImagenActual >= listaImagenes.length) {
-            indiceImagenActual = 0;
-          }
-          cargarImagen();
-          cargarComentarios();
+        btnDerecha.addEventListener("click", () => {
+          index = (index + 1) % imagenes.length;
+          cargarDatos();
         });
-
-        cargarImagen();
-        cargarComentarios();
+        cargarDatos();
       }
