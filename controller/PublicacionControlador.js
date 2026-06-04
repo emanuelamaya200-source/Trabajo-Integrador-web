@@ -50,14 +50,15 @@ export const verUnaPublicacion = async (req, res) => {
         if (!publicacion) {
             return res.status(404).send("Publicación no encontrada");
         }
-        const prettyString = JSON.stringify(publicacion, null, 2);
+
         const publicacionJSON = publicacion.toJSON();
-        if (!publicacionJSON.imagenes || publicacionJSON.imagenes.length === 0) {
-            return res.render("Publicaciones/publicacion", {publicacionJSON});
-        }
-        console.log(prettyString);
+        const valorizaciones = publicacionJSON.imagenes 
+            ? publicacionJSON.imagenes.map(img => img.valoraciones || [])
+            : [];
+
         return res.render("Publicaciones/publicacion", {   
-            objetoJSON: publicacionJSON
+            objetoJSON: publicacionJSON, 
+            valorizacionesArreglo: valorizaciones
         });
 
     } catch (err) {
