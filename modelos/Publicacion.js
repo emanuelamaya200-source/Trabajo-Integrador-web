@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 import { Imagen } from "./Imagen.js";
 import { Comentario } from "./Comentario.js";
 import { Usuario } from "./Usuario.js";
+import { Valoracion } from "./Valoracion.js";
  
 export class Publicacion extends Model {
       
@@ -96,6 +97,10 @@ static async buscarUnaPublicacion(id) {
                   as: "usuario" 
                 }
               ]
+            },
+            {
+              model:Valoracion,
+              as: "valoraciones"
             }
           ]
         },
@@ -111,6 +116,8 @@ static async buscarUnaPublicacion(id) {
     throw err;
   }
 }
+
+
 }
 
 Publicacion.init(

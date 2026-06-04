@@ -9,7 +9,13 @@ mixin publicacion(item)
             img#izquierda(src="/left.png", alt="izquierda", height="30px")
           div 
             img#imagenPrincipal(src="", alt="publicacion")
-            div#valorar promedio: 0
+            div#bloqueValorar.fila
+              form(action="/crearValoracion" method="POST")
+                input#inputImagenId2(type='hidden' name='imagen_id' value="")
+                input#valordevalorar(type="range", min="1" , max="10", value="5" name="valor")
+                input(type='hidden' name='post_id' value=item.id)
+                p#valorTexto Valor: 5
+                input(type="submit" value="Valorar")
           div
             img#derecha(src="/right.png", alt="derecha", height="30px")
         div#caracteristicas
@@ -36,7 +42,7 @@ mixin publicacion(item)
 
       form(action='/crearComentario' method='POST')
         input(type='hidden' name='post_id' value=item.id)
-        input(type='hidden' id='inputImagenId' name='imagen_id' value="")
+        input#inputImagenId(type='hidden' name='imagen_id' value="")
         textarea(name='contenido' placeholder='Escribe un comentario...' required)
         input(type='submit' value='Comentar')
 
@@ -47,11 +53,21 @@ mixin publicacion(item)
       const botonDerecha = document.querySelector("#derecha");
       const botonIzquierda = document.querySelector("#izquierda");
 
+      const valordevalorar = document.querySelector("#valordevalorar");
+      const valorTexto = document.querySelector("#valorTexto");
+
       const elementoImagen = document.querySelector("#imagenPrincipal");
       const elementoPromedio = document.querySelector("#promedio");
       const elementoContador = document.querySelector("#contadorImagenes");
       const elementoInputImagenId = document.querySelector("#inputImagenId");
+      const elementoInputImagenId2 = document.querySelector("#inputImagenId2");
       const elementoCajaComentarios = document.querySelector("#cajaComentarios");
+
+      if (valordevalorar) {
+        valordevalorar.addEventListener("input", function() {
+          valorTexto.textContent = "Valor: " + valordevalorar.value;
+        });
+      }
 
       function cargarImagen() {
         if (listaImagenes.length === 0) return;
@@ -61,7 +77,13 @@ mixin publicacion(item)
         elementoImagen.setAttribute("src", imagenActiva.url);
         elementoPromedio.textContent = "Promedio: " + (imagenActiva.promedio || 0);
         elementoInputImagenId.value = imagenActiva.id;
+        elementoInputImagenId2.value = imagenActiva.id;
         elementoContador.textContent = (indiceImagenActual + 1) + " / " + listaImagenes.length;
+        
+        if (valordevalorar) {
+          valordevalorar.value = 5;
+          valorTexto.textContent = "Valor: 5";
+        }
       }
 
       function cargarComentarios() {

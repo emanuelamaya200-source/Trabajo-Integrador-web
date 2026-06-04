@@ -2,6 +2,8 @@ import Publicacion from '../modelos/Publicacion.js';
 import { Imagen } from '../modelos/Imagen.js';
 import { Comentario } from '../modelos/Comentario.js';
 import { Usuario } from '../modelos/Usuario.js';
+import { Valoracion } from '../modelos/Valoracion.js';
+import session from 'express-session';
 
 export const mostrarFormulario = (req, res) => {
     res.render("Publicaciones/crearPubli");
@@ -68,9 +70,6 @@ export const crearComentario = async (req, res) => {
     const { post_id, imagen_id, contenido } = req.body; 
 
     try {
-        if (!req.session || !req.session.usuario) {
-            return res.status(401).send("Debes iniciar sesión para comentar");
-        }
         const usuarioId = req.session.usuario.id;
         await Comentario.crearComentario(imagen_id, usuarioId, contenido);
         return res.redirect(`/verPublicacion/${post_id}`);
@@ -81,4 +80,17 @@ export const crearComentario = async (req, res) => {
         }      
         return res.redirect("/");
     }
+};
+
+export const crearValoracion = async (req, res) => {
+  try {
+    const { valor, imagen_id, post_id } = req.body;
+    const usuarioId = req.session.usuario.id;
+    await Valoracion.crearValoracion(imagen_id, usuarioId, valor);
+    return res.redirect(`/verPublicacion/${post_id}`);
+
+  } catch (error) {
+    console.error("Error en el controlador crearValoracion:", error);
+    return res.status(500).send("Error interno al procesar la valoración");
+  }
 };

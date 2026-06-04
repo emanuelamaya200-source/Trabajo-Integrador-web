@@ -84,11 +84,12 @@ async function RelacionarTablas() {
     Publicacion.hasOne(Validador, { foreignKey: "publicacion_id" });
     Validador.belongsTo(Publicacion, { foreignKey: "publicacion_id" });
   
-    // Denuncias de comentarios y Valoraciones
+    // Denuncias de comentarios
     Comentario.hasMany(Denuncia_comentario, { foreignKey: "comentario_id" });
     Denuncia_comentario.belongsTo(Comentario, { foreignKey: "comentario_id" });
 
-    Imagen.hasMany(Valoracion, { foreignKey: "imagen_id" });
+    // CORREGIDO: Imagen y Valoracion (Sin alias en el belongsTo para evitar conflictos)
+    Imagen.hasMany(Valoracion, { as: "valoraciones", foreignKey: "imagen_id" });
     Valoracion.belongsTo(Imagen, { foreignKey: "imagen_id" });
     
     // Notificaciones
@@ -111,7 +112,7 @@ async function RelacionarTablas() {
     Notificacion.belongsTo(Comentario, { foreignKey: "comentario_id" });
 
   } catch (err) {
-    console.log(err);
+    console.error("Error al establecer relaciones:", err);
   }
 }
 
