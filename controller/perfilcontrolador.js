@@ -1,5 +1,6 @@
 import session from 'express-session';
 import { Usuario } from '../modelos/Usuario.js';
+import e from 'express';
 
 export const mostrarPerfil = async (req, res) => {
     try {
@@ -39,5 +40,23 @@ export const cambiarFotoDePerfil = async (req, res) => {
     } catch (error) {
         console.log("error al cambiar la foto de perfil", error);
         res.status(500).send("Error interno del servidor");
+    }
+};
+
+export const seguirUsuario = async (req, res) => {
+    try {
+        const { id } = req.params; 
+        const miId = req.session.usuario.id; 
+
+        const userAAgregar = await Usuario.findByPk(id);
+        
+        if (!userAAgregar) {
+            return res.status(404).send("Usuario no encontrado");
+        }
+        await userAAgregar.addSeguidores(miId); 
+        res.sendStatus(200); 
+    } catch (error) {
+        console.log("error al seguir usuario", error);
+        res.status(500).send("Error interno");
     }
 };

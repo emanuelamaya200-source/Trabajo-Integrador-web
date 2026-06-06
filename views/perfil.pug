@@ -53,23 +53,59 @@ block estilo
 block content 
     div#fdp
         img(src=usuario.foto_de_perfil alt="fotodeperfil")
-        h1= usuario.username 
+        h1= usuario.username
+        if !esMiPerfil
+            form
+                input#user(type="hidden", name="id_usuario", value=usuario.id)
+                input#seguir(type="button", name="seguir", value="Seguir")
+    
+    if !esMiPerfil
+        script.
+            const seguir = document.querySelector("#seguir");
+            const user = document.querySelector("#user");
+            
+            if (seguir) {
+                seguir.addEventListener("click", async (e) => {
+                    try {
+                        const response = await fetch(`/seguirUsuario/${user.value}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            location.reload(); 
+                        } else {
+                            alert("No se pudo seguir al usuario");
+                        }
+                    } catch (err) {
+                        console.error("Error en la petición:", err);
+                    }
+                });
+            }
 
     div#seguidos.fila
         h2 Seguidos
         ul
-            each item in usuario.seguidos
-                li.fila-usuario
-                    img.mini-foto(src=item.foto_de_perfil alt="foto")
-                    span= item.username
+            if usuario.seguidos && usuario.seguidos.length > 0
+                each item in usuario.seguidos
+                    li.fila-usuario
+                        img.mini-foto(src=item.foto_de_perfil alt="foto")
+                        span= item.username
+            else
+                li No sigue a ningún usuario aún.
                 
     div#seguidores.fila
         h2 Seguidores
         ul
-            each item in usuario.seguidores
-                li.fila-usuario
-                    img.mini-foto(src=item.foto_de_perfil alt="foto")
-                    span= item.username
+            if usuario.seguidores && usuario.seguidores.length > 0
+                each item in usuario.seguidores
+                    li.fila-usuario
+                        img.mini-foto(src=item.foto_de_perfil alt="foto")
+                        span= item.username
+            else
+                li No tiene seguidores todavía.
 
     div.fila.divisor
         div#mas   
@@ -85,7 +121,7 @@ block content
                 form#form
                     label(for="imagen") Actualizar Foto de Perfil
                     input#imagen(type="file", name="imagen" accept="image/*")
-                    input(type="hidden", name="id_perfil" accept="image/*")
+                    input(type="hidden", name="id_perfil")
                     button(type="submit") Guardar Foto
 
     if esMiPerfil
