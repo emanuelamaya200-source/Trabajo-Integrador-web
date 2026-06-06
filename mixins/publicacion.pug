@@ -70,12 +70,10 @@ mixin publicacion(item)
         const votos = img.valoraciones || [];
         let suma = 0;
 
-        // Recorremos los votos y los sumamos uno a uno
         for (const v of votos) {
             suma += Number(v.puntaje);
         }
 
-        // Calculamos el promedio dividiendo por la cantidad (si hay votos)
         let promedio = 0;
         if (votos.length > 0) {
             promedio = (suma / votos.length).toFixed(1);

@@ -1,0 +1,122 @@
+extends ./layout
+
+block estilo
+    style.
+        #fdp {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        #fdp img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        #seguidos, #seguidores, #mas {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .fila-usuario {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 0;
+        }
+        .mini-foto {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        #cambiar {
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #cambiar form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 250px;
+        }
+        .divisor {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around; 
+            margin: auto;
+        }
+
+block content 
+    div#fdp
+        img(src=usuario.foto_de_perfil alt="fotodeperfil")
+        h1= usuario.username 
+
+    div#seguidos.fila
+        h2 Seguidos
+        ul
+            each item in usuario.seguidos
+                li.fila-usuario
+                    img.mini-foto(src=item.foto_de_perfil alt="foto")
+                    span= item.username
+                
+    div#seguidores.fila
+        h2 Seguidores
+        ul
+            each item in usuario.seguidores
+                li.fila-usuario
+                    img.mini-foto(src=item.foto_de_perfil alt="foto")
+                    span= item.username
+
+    div.fila.divisor
+        div#mas   
+            h2 Información
+            p Usuario = #{usuario.username}
+            if esMiPerfil
+                p Mail = #{usuario.email}
+            p Estado = #{usuario.estado ? 'Activo' : 'Inactivo'}
+            p Ofertas = #{usuario.ofertas ? 'Sí' : 'No'}
+        
+        if esMiPerfil
+            div#cambiar
+                form#form
+                    label(for="imagen") Actualizar Foto de Perfil
+                    input#imagen(type="file", name="imagen" accept="image/*")
+                    input(type="hidden", name="id_perfil" accept="image/*")
+                    button(type="submit") Guardar Foto
+
+    if esMiPerfil
+        script.
+            const form = document.querySelector("#form");
+            const imagen = document.querySelector("#imagen");
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                
+                const archivo = imagen.files[0];
+                if (!archivo) return; 
+                const lector = new FileReader();
+                lector.readAsDataURL(archivo);
+                lector.onload = () => {
+                    const base64Resultado = lector.result; 
+
+                    fetch("/cambiarfotodeperfil", {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ imagen: base64Resultado })
+                    })
+                    .then(res => {
+                        if (res.ok) {
+                            location.reload();
+                        } else {
+                            alert("Error al procesar la imagen.");
+                        }
+                    })
+                    .catch(err => console.error("Error en la petición:", err));
+                };
+            });

@@ -9,14 +9,13 @@ mixin nav(className = "navc")
     li
       a(href='/crearPublicacion') Crear Publicación
     li
-      a#perfil(href='/perfil') Ver Perfil
+      if usuario
+        a#perfil(href=`/perfil/${usuario.id}`) Ver Perfil
 
   script.
     const buscar = document.querySelector("#buscar");
     buscar.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        // recordar empezar con / al principio
-        // window location href o sino window location replace
         window.location.href = `/Buscar/${buscar.value}`;
       }
     });

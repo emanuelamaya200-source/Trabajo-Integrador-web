@@ -8,6 +8,7 @@ import { Sincronizar } from './sync.js';
 import Publicaciones from"./rutas/Publicaciones.js"
 import RegYLogin from"./rutas/RegYLogin.js"
 import { requireAuth } from './controller/autenticador.js';
+import perfil from './rutas/perfil.js';
 
 // CONSTANTES
 const PORT = process.env.PORT;
@@ -49,6 +50,7 @@ app.use(express.urlencoded({ extended: true }));
 // para usar las rutas en un router
 app.use(RegYLogin);
 app.use(Publicaciones)
+app.use(perfil)
 
 // rutas
 app.get("/",(req, res , next)=>{

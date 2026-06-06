@@ -1,0 +1,43 @@
+import session from 'express-session';
+import { Usuario } from '../modelos/Usuario.js';
+
+export const mostrarPerfil = async (req, res) => {
+    try {
+        const idPerfil = req.params.id;
+        const data = await Usuario.devolverPerfil(idPerfil);
+        
+        if (!data) {
+            return res.status(404).send("Usuario no encontrado");
+        }
+        const esMiPerfil = req.session.usuario && req.session.usuario.id == idPerfil;
+
+        console.log(JSON.stringify(data, null, 2));
+        res.render("perfil", { 
+            usuario: data, 
+            esMiPerfil: esMiPerfil 
+        }); 
+        
+    } catch (error) {
+        console.log("Error al cargar perfil:", error);
+        res.status(500).send("Error interno del servidor");
+    }
+};
+
+export const cambiarFotoDePerfil = async (req, res) => {
+    try {
+        const { imagen } = req.body; 
+        const id = req.session.usuario.id;
+        let usuario = await Usuario.findByPk(id);
+
+        if (!usuario) {
+            return res.status(404).send("Usuario no encontrado");
+        }
+        usuario.foto_de_perfil = imagen; 
+        await usuario.save();
+        res.sendStatus(200);
+
+    } catch (error) {
+        console.log("error al cambiar la foto de perfil", error);
+        res.status(500).send("Error interno del servidor");
+    }
+};

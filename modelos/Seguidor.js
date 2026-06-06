@@ -1,7 +1,8 @@
-import { Model, DataTypes } from "sequelize";
-import {sequelize} from "../conexion.js";
+import { DataTypes, Model } from "sequelize"
+import { sequelize } from "../conexion.js" // Acordate del .js si usás ESM
+import { Usuario } from "./Usuario.js"
 
-export class Seguidor extends Model {}
+class Seguidor extends Model {}
 
 Seguidor.init(
   {
@@ -9,29 +10,34 @@ Seguidor.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+      allowNull: false
     },
     seguidor_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        //deja usuario para despues
+        model: () => Usuario, 
+        key: "id"
+      }
     },
     seguido_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: () => Usuario, 
+        key: "id"
+      }
     },
     fecha_inicio: {
       type: DataTypes.DATE,
-      allowNull: false,
-    },
-    fecha_fin: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
+      defaultValue: DataTypes.NOW
+    }
   },
   {
-    sequelize,
-    modelName: "seguidor",
-    tableName: "seguidores",
-    createdAt: true,
-    deletedAt: true,
-  },
-);
+    tableName: "seguidos",
+    sequelize
+  }
+)
+
+export { Seguidor }
