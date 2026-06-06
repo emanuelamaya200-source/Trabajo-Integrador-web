@@ -23,19 +23,20 @@ async function RelacionarTablas() {
     Publicacion.belongsTo(Usuario, { foreignKey: "usuario_id" });
 
     // Seguidores
-    Usuario.belongsToMany(Usuario, {
-      as: "Seguidores",
-      through: Seguidor,
-      foreignKey: "seguido_id",
-      otherKey: "seguidor_id"
+    Usuario.belongsToMany(Usuario, { 
+      through: Seguidor, 
+      as: "seguidos",       
+      foreignKey: "seguidor_id", 
+      otherKey: "seguido_id" 
     });
-    Usuario.belongsToMany(Usuario, {
-      as: "Seguidos",  
-      through: Seguidor,
-      foreignKey: "seguidor_id",
-      otherKey: "seguido_id"
+
+    Usuario.belongsToMany(Usuario, { 
+      through: Seguidor, 
+      as: "seguidores",      
+      foreignKey: "seguido_id", 
+      otherKey: "seguidor_id" 
     });
-    
+
     // Colecciones y Denuncias de Usuario
     Usuario.hasMany(Coleccion, { foreignKey: "usuario_id" });
     Coleccion.belongsTo(Usuario, { foreignKey: "usuario_id" });
