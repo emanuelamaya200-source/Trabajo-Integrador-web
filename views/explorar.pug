@@ -1,0 +1,81 @@
+extends ./layout
+
+block estilo
+    style.
+        .contenedor-explorar {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .publicacion-card {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .autor-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .mini-foto {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .autor-nombre {
+            font-weight: bold;
+            color: #333;
+        }
+        .contenido-post {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #444;
+        }
+        .contenido-post h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+        }
+        /* Estilo para el anchor del título */
+        .link-publicacion {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .link-publicacion:hover {
+            text-decoration: underline;
+        }
+        .fecha-post {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+block content
+    div.contenedor-explorar
+        h1 Explorar Publicaciones
+        
+        if publicaciones && publicaciones.length > 0
+            each post in publicaciones
+                div.publicacion-card
+                    div.autor-info
+                        if post.creador
+                            img.mini-foto(src=post.creador.foto_de_perfil alt=`Foto de ${post.creador.username}`)
+                            span.autor-nombre= post.creador.username
+                        else
+                            img.mini-foto(src="/imagenes/default-avatar.png" alt="Anónimo")
+                            span.autor-nombre Publicación Anónima
+                    
+                    div.contenido-post
+                        h3
+                            a.link-publicacion(href=`/verPublicacion/${post.id}`)= post.titulo
+                        p= post.descripcion
+                    
+                    div.fecha-post
+                        span= new Date(post.createdAt).toLocaleDateString()
+        else
+            p No hay publicaciones para mostrar en este momento.

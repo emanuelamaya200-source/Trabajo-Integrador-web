@@ -12,7 +12,8 @@ export const mostrarFormulario = (req, res) => {
 export const crearPublicacion = async (req, res) => {
     try {
         const { imagenes, titulo, descripcion, etiquetas } = req.body;
-        const publicacion = await Publicacion.crearPublicacion(titulo, descripcion, etiquetas);
+        const user_id = req.session.usuario.id
+        const publicacion = await Publicacion.crearPublicacion(titulo, descripcion, etiquetas,user_id);
         
         if (imagenes) {
             for (const element of imagenes) {

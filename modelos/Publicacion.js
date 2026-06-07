@@ -9,29 +9,30 @@ import { Valoracion } from "./Valoracion.js";
  
 export class Publicacion extends Model {
       
-  static async crearPublicacion(ptitulo, pdescripcion, etiquetas) {
-    try {
-      const publi = await Publicacion.create({
-        titulo: ptitulo,
-        descripcion: pdescripcion,
-      });
-      
-      if (etiquetas && etiquetas.length > 0) {
-        for (const nombreEtiqueta of etiquetas) {
-          const [etiqueta] = await Etiqueta.findOrCreate({
-            where: { nombre: nombreEtiqueta }
-          });
+static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
+  try {
+    const publi = await Publicacion.create({
+      titulo: ptitulo,
+      descripcion: pdescripcion,
+      usuario_id: idUsuario 
+    });
+    
+    if (etiquetas && etiquetas.length > 0) {
+      for (const nombreEtiqueta of etiquetas) {
+        const [etiqueta] = await Etiqueta.findOrCreate({
+          where: { nombre: nombreEtiqueta }
+        });
 
-          await publi.addEtiqueta(etiqueta); 
-        }
+        await publi.addEtiqueta(etiqueta); 
       }
-      
-      return publi;
-      
-    } catch(err) {
-      console.log("Error al crear publicacion:", err);
     }
+    
+    return publi;
+    
+  } catch(err) {
+    console.log("Error al crear publicacion:", err);
   }
+}
 
   static async buscarPublicacionesTodo(todo) {
     try {
