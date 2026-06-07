@@ -8,5 +8,6 @@ const router = express.Router();
 router.get("/perfil/:id", requireAuth, per.mostrarPerfil)
 router.post("/cambiarfotodeperfil", requireAuth, per.cambiarFotoDePerfil)
 router.post("/seguirUsuario/:id", requireAuth, per.seguirUsuario)
+router.get("/explorar", per.cargarExplorar)
 
 export default router;

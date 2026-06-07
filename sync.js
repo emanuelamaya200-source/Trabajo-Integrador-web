@@ -18,14 +18,14 @@ import { PublicacionEtiqueta } from "./modelos/PublicacionEtiqueta.js"
 
 async function RelacionarTablas() {
   try {
-    // Usuario y publicacion
-    Usuario.hasMany(Publicacion, { foreignKey: "usuario_id" });
-    Publicacion.belongsTo(Usuario, { foreignKey: "usuario_id" });
+    // usuario
+    Usuario.hasMany(Publicacion, { foreignKey: "usuario_id", as: "publicaciones" });
+    Publicacion.belongsTo(Usuario, { foreignKey: "usuario_id", as: "creador" });
 
     // Seguidores
     Usuario.belongsToMany(Usuario, { 
       through: Seguidor, 
-      as: "seguidos",       
+      as: "seguidos",      
       foreignKey: "seguidor_id", 
       otherKey: "seguido_id" 
     });
@@ -92,7 +92,7 @@ async function RelacionarTablas() {
     Comentario.hasMany(Denuncia_comentario, { foreignKey: "comentario_id" });
     Denuncia_comentario.belongsTo(Comentario, { foreignKey: "comentario_id" });
 
-    // CORREGIDO: Imagen y Valoracion (Sin alias en el belongsTo para evitar conflictos)
+    // Imagen y valoracion
     Imagen.hasMany(Valoracion, { as: "valoraciones", foreignKey: "imagen_id" });
     Valoracion.belongsTo(Imagen, { foreignKey: "imagen_id" });
     
