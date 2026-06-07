@@ -1,6 +1,6 @@
 # Fotaza 2 - Web II
 
-app para subir y compartir fotos, hecha con node, express, pug y postgresql
+app para subir y compartir fotos, hecha con node, express, pug, postgresql y sequelize
 
 repo: https://github.com/emanuelamaya200-source/Trabajo-Integrador-web  
 produccion: https://trabajo-integrador-web-production.up.railway.app/
