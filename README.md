@@ -4,6 +4,7 @@ app para subir y compartir fotos, hecha con node, express, pug, postgresql y seq
 
 repo: https://github.com/emanuelamaya200-source/Trabajo-Integrador-web  
 produccion: https://trabajo-integrador-web-production.up.railway.app/
+produccion2 :https://dashboard.render.com/web/srv-d8jj77mrnols7384qeeg
 
 ---
 
