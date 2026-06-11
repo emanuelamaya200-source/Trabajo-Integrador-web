@@ -49,19 +49,6 @@ block estilo
             justify-content: space-around; 
             margin: auto;
         }
-        #bloque-salir {
-            text-align: center;
-            margin-top: 30px;
-            padding: 10px;
-        }
-        #btn-salir {
-            padding: 10px 20px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
 
 block content 
     div#fdp
@@ -138,58 +125,34 @@ block content
                     button(type="submit") Guardar Foto
 
     if esMiPerfil
-        div#bloque-salir
-            button#btn-salir(type="button") Cerrar Sesión
-
-    if esMiPerfil
         script.
             const form = document.querySelector("#form");
             const imagen = document.querySelector("#imagen");
-            const btnSalir = document.querySelector("#btn-salir");
 
-            if (form) {
-                form.addEventListener("submit", (e) => {
-                    e.preventDefault();
-                    const archivo = imagen.files[0];
-                    if (!archivo) return; 
-                    const lector = new FileReader();
-                    lector.readAsDataURL(archivo);
-                    lector.onload = () => {
-                        const base64Resultado = lector.result; 
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                
+                const archivo = imagen.files[0];
+                if (!archivo) return; 
+                const lector = new FileReader();
+                lector.readAsDataURL(archivo);
+                lector.onload = () => {
+                    const base64Resultado = lector.result; 
 
-                        fetch("/cambiarfotodeperfil", {
-                            method: 'POST',
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({ imagen: base64Resultado })
-                        })
-                        .then(res => {
-                            if (res.ok) {
-                                location.reload();
-                            } else {
-                                alert("Error al procesar la imagen.");
-                            }
-                        })
-                        .catch(err => console.error("Error en la petición:", err));
-                    };
-                });
-            }
-
-            if (btnSalir) {
-                btnSalir.addEventListener("click", async () => {
-                    try {
-                        const res = await fetch("/logout", { 
-                            method: 'POST' 
-                        });
-                        
+                    fetch("/cambiarfotodeperfil", {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ imagen: base64Resultado })
+                    })
+                    .then(res => {
                         if (res.ok) {
-                            window.location.href = "/"; 
+                            location.reload();
                         } else {
-                            alert("Error al cerrar sesión");
+                            alert("Error al procesar la imagen.");
                         }
-                    } catch (err) {
-                        console.error("Error en la petición de cierre:", err);
-                    }
-                });
-            }
+                    })
+                    .catch(err => console.error("Error en la petición:", err));
+                };
+            });

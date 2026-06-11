@@ -85,14 +85,3 @@ export const cargarExplorar = async (req, res) => {
         res.status(500).send("Error interno");
     }
 };
-
-export const eliminarSession = (req, res) => {
-    req.session.destroy((error) => {
-        if (error) {
-            console.log("Error al destruir la sesión:", error);
-            return res.status(500).json({ error: "No se pudo cerrar la sesión" });
-        }  
-        res.clearCookie('connect.sid');
-        return res.json({ mensaje: 'Sesión destruida con éxito' });
-    });
-};
