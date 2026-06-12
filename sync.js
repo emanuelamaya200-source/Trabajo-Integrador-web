@@ -40,7 +40,7 @@ async function RelacionarTablas() {
     // Colecciones y Denuncias de Usuario
     Usuario.hasMany(Coleccion, { foreignKey: "usuario_id" });
     Coleccion.belongsTo(Usuario, { foreignKey: "usuario_id" });
-    
+
     Usuario.hasMany(Denuncia_usuario, { foreignKey: "usuario_id" });
     Denuncia_usuario.belongsTo(Usuario, { foreignKey: "usuario_id" });
    

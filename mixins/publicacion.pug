@@ -1,24 +1,67 @@
 mixin publicacion(item) 
-  div.publicacion
+  div.publicacion(data-post-id=item.id)
+    style.
+      .publicacion, .publicacion * {
+        box-sizing: border-box;
+      }
+      .publicacion h1, .publicacion p, .publicacion li, .autor-publicacion {
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+      }
+      #publicacionparteuno {
+        overflow-y: auto;
+      }
+      .imagenes-contenedor {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 320px;
+        margin-bottom: 20px;
+        background-color: #fafafa;
+        border-radius: 12px;
+        padding: 10px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .imagenPrincipal {
+        max-width: 85%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+        flex-shrink: 0;
+      }
     div#publicacionparteuno
+      if item.creador
+        a(href="/perfil/" + item.creador.id style="text-decoration: none; color: inherit;")
+          p.autor-publicacion Creador de la publicación: #{item.creador.username}
+      else
+        p.autor-publicacion Creador: Anónimo
+
       if item.imagenes && item.imagenes.length > 0 
-        div#contadorImagenes 0 / 0
-        div#imagenes
-          img#izquierda(src="/left.png" height="30px")
-          img#imagenPrincipal(src="")
-          img#derecha(src="/right.png" height="30px")
-        div#caracteristicas
-          p#promedio Promedio: 0
-          p#copyright
-          div#bloqueValorar
+        div.contadorImagenes 1 / #{item.imagenes.length}
+        div.imagenes-contenedor
+          img.btn-izquierda(src="/left.png" height="30px" style="cursor:pointer")
+          img.imagenPrincipal(src="")
+          img.btn-derecha(src="/right.png" height="30px" style="cursor:pointer")
+        div.caracteristicas
+          p.promedio Promedio: 0
+          p.copyright
+          
+          div.bloqueValorar
             form(action="/crearValoracion" method="POST")
-              input#inputImagenId2(type='hidden' name='imagen_id' value="")
-              input#valordevalorar(type="range" min="1" max="10" value="5" name="valor")
+              input.inputImagenId2(type='hidden' name='imagen_id' value="")
+              input.valordevalorar(type="range" min="1" max="10" value="5" name="valor")
               input(type='hidden' name='post_id' value=item.id)
-              p#valorTexto Valor: 5
+              p.valorTexto Valor: 5
               input(type="submit" value="Valorar")
       else
-        p imagen no encontrada
+        p Imagen no encontrada
           
       h1= item.titulo
       p= item.descripcion
@@ -31,75 +74,107 @@ mixin publicacion(item)
     div#publicacioncomentarios
       div
         h1 Comentarios
-        div#cajaComentarios
+        div.cajaComentarios
 
       form(action='/crearComentario' method='POST')
         input(type='hidden' name='post_id' value=item.id)
-        input#inputImagenId(type='hidden' name='imagen_id' value="")
+        input.inputImagenId(type='hidden' name='imagen_id' value="")
         textarea(name='contenido' required placeholder="Escribe un comentario...")
         input(type='submit' value='Comentar')
 
     script.
-      const imagenes = !{JSON.stringify(item.imagenes || [])};
-      let index = 0;
+      (function() {
+        const imagenes = !{JSON.stringify(item.imagenes || [])};
+        let index = 0;
 
-      const btnDerecha = document.querySelector("#derecha");
-      const btnIzquierda = document.querySelector("#izquierda");
-      const rangevoto = document.querySelector("#valordevalorar");
-      const txtvoto = document.querySelector("#valorTexto");
-      const elImagen = document.querySelector("#imagenPrincipal");
-      const elPromedio = document.querySelector("#promedio");
-      const elContador = document.querySelector("#contadorImagenes");
-      const cajaCmts = document.querySelector("#cajaComentarios");
-      // Selecciona los dos inputs ocultos de los ID de imagen a la vez
-      const inputsId = document.querySelectorAll("#inputImagenId, #inputImagenId2");
+        const contenedor = document.querySelector('[data-post-id="' + !{item.id} + '"]');
+        if (!contenedor) return;
 
-      if (rangevoto) {
-        rangevoto.addEventListener("input", () => txtvoto.textContent = `Valor: ${rangevoto.value}`);
-      }
+        // variables
+        const btnDerecha = contenedor.querySelector(".btn-derecha");
+        const btnIzquierda = contenedor.querySelector(".btn-izquierda");
+        const rangevoto = contenedor.querySelector(".valordevalorar");
+        const txtvoto = contenedor.querySelector(".valorTexto");
+        const elImagen = contenedor.querySelector(".imagenPrincipal");
+        const elPromedio = contenedor.querySelector(".promedio");
+        const elContador = contenedor.querySelector(".contadorImagenes");
+        const cajaCmts = contenedor.querySelector(".cajaComentarios");
+        const inputsId = contenedor.querySelectorAll(".inputImagenId, .inputImagenId2");
 
-      function cargarDatos() {
-        if (!imagenes.length) return;
-        const img = imagenes[index];
-
-        elImagen.src = img.url;
-        elContador.textContent = `${index + 1} / ${imagenes.length}`;
-        inputsId.forEach(input => input.value = img.id);
-        
-        
-        const votos = img.valoraciones || [];
-        let suma = 0;
-
-        for (const v of votos) {
-            suma += Number(v.puntaje);
+        if (rangevoto && txtvoto) {
+          rangevoto.addEventListener("input", function() {
+            txtvoto.textContent = "Valor: " + rangevoto.value;
+          });
         }
 
-        let promedio = 0;
-        if (votos.length > 0) {
+        function cargarDatos() {
+          if (!imagenes.length || !elImagen) return;
+          const img = imagenes[index];
+
+          elImagen.src = img.url || img.ruta; 
+          
+          if (elContador) {
+            elContador.textContent = (index + 1) + " / " + imagenes.length;
+          }
+          
+          inputsId.forEach(function(input) {
+            input.value = img.id || 0;
+          });
+          
+          const votos = img.valoraciones || [];
+          let suma = 0;
+          for (let i = 0; i < votos.length; i++) {
+            suma += Number(votos[i].puntaje);
+          }
+
+          let promedio = 0;
+          if (votos.length > 0) {
             promedio = (suma / votos.length).toFixed(1);
+          }
+
+          if (elPromedio) {
+            elPromedio.textContent = "Promedio: " + promedio;
+          }
+          
+          if (rangevoto && txtvoto) {
+            rangevoto.value = 5;
+            txtvoto.textContent = "Valor: 5";
+          }
+
+          const comentarios = img.comentarios || [];
+          let htmlComentarios = "";
+
+          if (comentarios.length > 0) {
+            comentarios.forEach(function(c) {
+              const nombreUsuario = c.usuario ? c.usuario.username : "Usuario Anónimo";
+              htmlComentarios += '<div class="comentario">';
+              htmlComentarios += '  <strong>' + nombreUsuario + ': </strong>';
+              htmlComentarios += '  <p>' + c.contenido + '</p>';
+              htmlComentarios += '</div>';
+            });
+          } else {
+            htmlComentarios = "<p>No hay comentarios aún.</p>";
+          }
+
+          if (cajaCmts) {
+            cajaCmts.innerHTML = htmlComentarios;
+          }
         }
 
-        elPromedio.textContent = `Promedio: ${promedio}`;
-        
-        if (rangevoto) {
-          rangevoto.value = 5;
-          txtvoto.textContent = "Valor: 5";
+        //carrusel
+        if (imagenes.length) {
+          if (btnIzquierda) {
+            btnIzquierda.addEventListener("click", function() {
+              index = (index - 1 + imagenes.length) % imagenes.length;
+              cargarDatos();
+            });
+          }
+          if (btnDerecha) {
+            btnDerecha.addEventListener("click", function() {
+              index = (index + 1) % imagenes.length;
+              cargarDatos();
+            });
+          }
+          cargarDatos();
         }
-
-        const comentarios = img.comentarios || [];
-        cajaCmts.innerHTML = comentarios.length 
-          ? comentarios.map(c => `<div><strong>${c.usuario ? c.usuario.username : "Usuario"}</strong><p>${c.contenido}</p></div>`).join("")
-          : "<p>No hay comentarios aún.</p>";
-      }
-
-      if (imagenes.length) {
-        btnIzquierda.addEventListener("click", () => {
-          index = (index - 1 + imagenes.length) % imagenes.length;
-          cargarDatos();
-        });
-        btnDerecha.addEventListener("click", () => {
-          index = (index + 1) % imagenes.length;
-          cargarDatos();
-        });
-        cargarDatos();
-      }
+      })();

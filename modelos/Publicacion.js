@@ -92,15 +92,10 @@ static async buscarUnaPublicacion(id) {
             {
               model: Comentario,
               as: "comentarios", 
-              include: [
-                {
-                  model: Usuario,
-                  as: "usuario" 
-                }
-              ]
+              include: [{ model: Usuario, as: "usuario" }] // El que comentó
             },
             {
-              model:Valoracion,
+              model: Valoracion,
               as: "valoraciones"
             }
           ]
@@ -108,16 +103,20 @@ static async buscarUnaPublicacion(id) {
         {
           model: Etiqueta,
           as: "etiquetas"
+        },
+        {
+          model: Usuario,
+          as: "creador" 
         }
       ]
     });
+
     return publicacion;
   } catch (err) {
     console.error("Error al buscar la publicación por PK:", err);
     throw err;
   }
 }
-
 
 }
 

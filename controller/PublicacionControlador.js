@@ -52,7 +52,13 @@ export const verUnaPublicacion = async (req, res) => {
             return res.status(404).send("Publicación no encontrada");
         }
 
+        
+
         const publicacionJSON = publicacion.toJSON();
+
+        const objetostring = JSON.stringify(publicacionJSON,null,2)
+        console.log(publicacionJSON);
+
         const valorizaciones = publicacionJSON.imagenes 
             ? publicacionJSON.imagenes.map(img => img.valoraciones || [])
             : [];
