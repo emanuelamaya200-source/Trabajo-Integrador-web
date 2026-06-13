@@ -2,9 +2,13 @@
 
 app para subir y compartir fotos, hecha con node, express, pug, postgresql y sequelize
 
-repo: https://github.com/emanuelamaya200-source/Trabajo-Integrador-web  
-produccion: https://trabajo-integrador-web-production.up.railway.app/
-produccion2 :https://dashboard.render.com/web/srv-d8jj77mrnols7384qeeg
+Github: https://github.com/emanuelamaya200-source/Trabajo-Integrador-web
+
+apps en la web
+railway: https://trabajo-integrador-web-production.up.railway.app/ 
+render:https://trabajo-integrador-web.onrender.com/
+
+video con demostracion: https://www.youtube.com/watch?v=xBSixmAtIq4
 
 ---
 
