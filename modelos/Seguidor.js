@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize"
-import { sequelize } from "../conexion.js" // Acordate del .js si usás ESM
+import { sequelize } from "../conexion.js" 
 import { Usuario } from "./Usuario.js"
 
 class Seguidor extends Model {}
@@ -16,7 +16,7 @@ Seguidor.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        //deja usuario para despues
+       
         model: () => Usuario, 
         key: "id"
       }

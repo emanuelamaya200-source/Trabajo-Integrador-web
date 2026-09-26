@@ -2,13 +2,14 @@ import { Model, DataTypes } from "sequelize";
 import { sequelize } from "../conexion.js";
 
 export class Imagen extends Model {
-  static async crearImagen(post, purl, pcopyright, plicencia) {
+  static async crearImagen(post, purl, pcopyright, plicencia, pprecio) {
     try {
       const Ima = Imagen.build({            
         post_id: post,
         url: purl,
         licencia: plicencia,
         copyrigth: pcopyright,
+        Precio: pprecio ?? null,
       });
       await Ima.save();
       return Ima;
@@ -49,6 +50,11 @@ Imagen.init({
     type: DataTypes.STRING,
     allowNull: true,
     defaultValue: false,
+  },
+  Precio: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0,
   },
   marcaAgua: {
     type: DataTypes.STRING,

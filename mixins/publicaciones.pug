@@ -7,6 +7,8 @@ mixin publicaciones(item)
             each val in item.imagenes
               li
                 img(src=val.url, alt="publicacion", style="width: 200px;")
+                if val.Precio !== null && val.Precio !== undefined
+                  p.precio-imagen Precio: $#{Number(val.Precio).toLocaleString('es-AR')}
       else
         p imagen no encontrada
           

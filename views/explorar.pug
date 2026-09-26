@@ -73,6 +73,10 @@ block content
                         h3
                             a.link-publicacion(href=`/verPublicacion/${post.id}`)= post.titulo
                         p= post.descripcion
+                        if post.imagenes
+                            each imagen in post.imagenes
+                                if imagen.Precio !== null && imagen.Precio !== undefined
+                                    p Precio: $#{Number(imagen.Precio).toLocaleString('es-AR')}
                     
                     div.fecha-post
                         span= new Date(post.createdAt).toLocaleDateString()

@@ -12,12 +12,18 @@ export const mostrarFormulario = (req, res) => {
 export const crearPublicacion = async (req, res) => {
     try {
         const { imagenes, titulo, descripcion, etiquetas } = req.body;
+        for (const imagen of imagenes || []) {
+            if (imagen.precio !== null && imagen.precio !== undefined &&
+                (!Number.isInteger(imagen.precio) || imagen.precio < 0)) {
+                return res.status(400).json({ ok: false, error: "El precio debe ser un entero no negativo" });
+            }
+        }
         const user_id = req.session.usuario.id
         const publicacion = await Publicacion.crearPublicacion(titulo, descripcion, etiquetas,user_id);
         
         if (imagenes) {
             for (const element of imagenes) {
-                await Imagen.crearImagen(publicacion.id, element.base64, element.copyright, element.licencia);
+                await Imagen.crearImagen(publicacion.id, element.base64, element.copyright, element.licencia, element.precio);
             }
         }
         return res.status(200).json({ ok: true });
@@ -79,16 +85,40 @@ export const crearComentario = async (req, res) => {
 
     try {
         const usuarioId = req.session.usuario.id;
-        await Comentario.crearComentario(imagen_id, usuarioId, contenido);
-        return res.redirect(`/verPublicacion/${post_id}`);
+        const Publicacion = Publicacion.findByPk(post_id);
+        if(publicacion.comentarios_permitidos){
+            await Comentario.crearComentario(imagen_id, usuarioId, contenido);
+            return res.redirect(`/verPublicacion/${post_id}`);
+        }else{
+            if (post_id) {
+                console.error("Comentarios Desactivados", error);
+                return res.redirect(`/verPublicacion/${post_id}`);               
+            }
+            //por si acaso no hay id
+            return res.redirect("/");
+        }
     } catch (error) {
-        console.error("Error crítico en el controlador crearComentario:", error);
+        console.error("Error al crearComentario:", error);
         if (post_id) {
             return res.redirect(`/verPublicacion/${post_id}`);
-        }      
+        }
+        //por si acaso no hay id      
         return res.redirect("/");
     }
 };
+
+export const desactivarComentarios = async (req,res) =>{
+    try{
+    const {post_id} = req.body;
+    const PublicacionACambiar = Publicacion.findByPk(post_id);
+    await PublicacionACambiar.reload();
+    PublicacionACambiar.comentariosPermitidos = false;
+    PublicacionACambiar.save();
+    }catch(error){
+
+    }
+    
+}
 
 export const crearValoracion = async (req, res) => {
   try {

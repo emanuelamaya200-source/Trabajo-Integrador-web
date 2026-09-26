@@ -1,4 +1,4 @@
-mixin publicacion(item) 
+mixin publicacion(item,mensaje) 
   div.publicacion(data-post-id=item.id)
     style.
       .publicacion, .publicacion * {
@@ -36,10 +36,15 @@ mixin publicacion(item)
         margin: 0 auto;
         flex-shrink: 0;
       }
+      .precioImagen {
+        font-weight: bold;
+      }
     div#publicacionparteuno
       if item.creador
         a(href="/perfil/" + item.creador.id style="text-decoration: none; color: inherit;")
           p.autor-publicacion Creador de la publicación: #{item.creador.username}
+        // Se mantiene fuera del tag <a> para evitar redirección
+        p#seguirautor(style="cursor: pointer;") Seguir Autor
       else
         p.autor-publicacion Creador: Anónimo
 
@@ -52,6 +57,7 @@ mixin publicacion(item)
         div.caracteristicas
           p.promedio Promedio: 0
           p.copyright
+          p.precioImagen(style="display: none;")
           
           div.bloqueValorar
             form(action="/crearValoracion" method="POST")
@@ -76,7 +82,7 @@ mixin publicacion(item)
         h1 Comentarios
         div.cajaComentarios
 
-      form(action='/crearComentario' method='POST')
+      form.formComentario(action='/crearComentario' method='POST')
         input(type='hidden' name='post_id' value=item.id)
         input.inputImagenId(type='hidden' name='imagen_id' value="")
         textarea(name='contenido' required placeholder="Escribe un comentario...")
@@ -85,9 +91,11 @@ mixin publicacion(item)
     script.
       (function() {
         const imagenes = !{JSON.stringify(item.imagenes || [])};
+        const creadorId = "!{item.creador ? item.creador.id : ''}";
+        const comentariosPermitidos = !{Boolean(item.comentarios_permitidos)};
         let index = 0;
 
-        const contenedor = document.querySelector('[data-post-id="' + !{item.id} + '"]');
+        const contenedor = document.querySelector('[data-post-id="' + '!{item.id}' + '"]');
         if (!contenedor) return;
 
         // variables
@@ -97,13 +105,36 @@ mixin publicacion(item)
         const txtvoto = contenedor.querySelector(".valorTexto");
         const elImagen = contenedor.querySelector(".imagenPrincipal");
         const elPromedio = contenedor.querySelector(".promedio");
+        const elPrecio = contenedor.querySelector(".precioImagen");
         const elContador = contenedor.querySelector(".contadorImagenes");
         const cajaCmts = contenedor.querySelector(".cajaComentarios");
         const inputsId = contenedor.querySelectorAll(".inputImagenId, .inputImagenId2");
+        const seguirAutor = contenedor.querySelector("#seguirautor");
+        const formComentario = contenedor.querySelector(".formComentario");
 
         if (rangevoto && txtvoto) {
           rangevoto.addEventListener("input", function() {
             txtvoto.textContent = "Valor: " + rangevoto.value;
+          });
+        }
+
+        // seguir a autor desde la publicacion
+        if (seguirAutor) {
+          seguirAutor.addEventListener("click", async function (event){
+            event.preventDefault();
+            try {
+              if (creadorId) {
+                const resultado = await fetch("/seguirUsuario/" + creadorId, {
+                  method: 'POST'
+                });
+                
+                if (resultado.ok) {
+                  seguirAutor.textContent = "Siguiendo";
+                }
+              }
+            } catch (error) {
+              console.error("Error al seguir autor:", error);
+            }
           });
         }
 
@@ -112,6 +143,14 @@ mixin publicacion(item)
           const img = imagenes[index];
 
           elImagen.src = img.url || img.ruta; 
+
+          if (elPrecio) {
+            const precio = img.Precio;
+            elPrecio.textContent = precio !== null && precio !== undefined
+              ? "Precio: $" + Number(precio).toLocaleString("es-AR")
+              : "";
+            elPrecio.style.display = precio !== null && precio !== undefined ? "block" : "none";
+          }
           
           if (elContador) {
             elContador.textContent = (index + 1) + " / " + imagenes.length;
@@ -146,7 +185,7 @@ mixin publicacion(item)
 
           if (comentarios.length > 0) {
             comentarios.forEach(function(c) {
-              const nombreUsuario = c.usuario ? c.usuario.username : "Usuario Anónimo";
+              const nombreUsuario = c.usuario ? c.usuario.username : "Anonimo";
               htmlComentarios += '<div class="comentario">';
               htmlComentarios += '  <strong>' + nombreUsuario + ': </strong>';
               htmlComentarios += '  <p>' + c.contenido + '</p>';
@@ -161,7 +200,7 @@ mixin publicacion(item)
           }
         }
 
-        //carrusel
+        // carrusel
         if (imagenes.length) {
           if (btnIzquierda) {
             btnIzquierda.addEventListener("click", function() {
@@ -177,4 +216,15 @@ mixin publicacion(item)
           }
           cargarDatos();
         }
+
+        //desactivar comentar si estan desabilitados
+
+        if (!comentariosPermitidos && formComentario) {
+          const elementosForm = formComentario.querySelectorAll("textarea, input[type='submit']");
+          elementosForm.forEach(function(el) {
+            el.setAttribute("disabled", "true");
+          });
+        }
+
+        //desactivar comentarios
       })();

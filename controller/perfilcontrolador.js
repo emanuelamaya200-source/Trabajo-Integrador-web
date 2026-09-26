@@ -1,6 +1,7 @@
 import session from 'express-session';
 import { Usuario } from '../modelos/Usuario.js';
 import {Publicacion} from "../modelos/Publicacion.js"
+import { Imagen } from '../modelos/Imagen.js';
 import e from 'express';
 
 export const mostrarPerfil = async (req, res) => {
@@ -66,6 +67,11 @@ export const cargarExplorar = async (req, res) => {
     try {
         const publicaciones = await Publicacion.findAll({
             include: [
+                {
+                    model: Imagen,
+                    as: 'imagenes',
+                    attributes: ['Precio']
+                },
                 {
                     model: Usuario,
                     as: 'creador',
