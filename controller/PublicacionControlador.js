@@ -4,6 +4,7 @@ import { Comentario } from '../modelos/Comentario.js';
 import { Usuario } from '../modelos/Usuario.js';
 import { Valoracion } from '../modelos/Valoracion.js';
 import session from 'express-session';
+import { BOOLEAN } from 'sequelize';
 
 export const mostrarFormulario = (req, res) => {
     res.render("Publicaciones/crearPubli");
@@ -15,7 +16,7 @@ export const crearPublicacion = async (req, res) => {
         for (const imagen of imagenes || []) {
             if (imagen.precio !== null && imagen.precio !== undefined &&
                 (!Number.isInteger(imagen.precio) || imagen.precio < 0)) {
-                return res.status(400).json({ ok: false, error: "El precio debe ser un entero no negativo" });
+                return res.status(400).json({ ok: false, error: "El precio debe ser un mayor a 0" });
             }
         }
         const user_id = req.session.usuario.id
@@ -37,10 +38,8 @@ export const crearPublicacion = async (req, res) => {
 export const buscarPublicaciones = async (req, res) => {
     try {
         const { busqueda } = req.params;
-        const { cantidad, fila } = await Publicacion.buscarPublicacionesTodo(busqueda);
-
-        const jsonFormateado = JSON.stringify(fila, null, 2);
-        console.log(jsonFormateado);
+        const usuarioLogueado = Boolean(req.session && req.session.usuario);
+        const { cantidad, fila } = await Publicacion.buscarPublicacionesTodo(busqueda, usuarioLogueado);
 
         res.render("Publicaciones/busqueda", { busqueda, cantidad, publicaciones: fila });
     } catch (err) {
@@ -52,18 +51,18 @@ export const buscarPublicaciones = async (req, res) => {
 export const verUnaPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
-        const publicacion = await Publicacion.buscarUnaPublicacion(id);
+        const usuarioLogueado = Boolean(req.session && req.session.usuario);
+        const publicacion = await Publicacion.buscarUnaPublicacion(id, usuarioLogueado);
 
         if (!publicacion) {
             return res.status(404).send("Publicación no encontrada");
         }
 
-        
-
         const publicacionJSON = publicacion.toJSON();
 
-        const objetostring = JSON.stringify(publicacionJSON,null,2)
-        console.log(publicacionJSON);
+        if (!usuarioLogueado) {
+            publicacionJSON.imagenes = (publicacionJSON.imagenes || []).filter((imagen) => imagen.copyrigth === false);
+        }
 
         const valorizaciones = publicacionJSON.imagenes 
             ? publicacionJSON.imagenes.map(img => img.valoraciones || [])

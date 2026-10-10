@@ -34,27 +34,27 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
   }
 }
 
-  static async buscarPublicacionesTodo(todo) {
+  static async buscarPublicacionesTodo(todo, logueado = false) {
     try {
       const publicacionesCoincidentes = await Publicacion.findAll({
-        attributes: ['id'], 
+        attributes: ['id'],
         where: {
           [Op.or]: [
             { titulo: { [Op.like]: `%${todo}%` } },
             { descripcion: { [Op.like]: `%${todo}%` } },
-            { '$etiquetas.nombre$': { [Op.like]: `%${todo}%` } } 
+            { '$etiquetas.nombre$': { [Op.like]: `%${todo}%` } }
           ]
         },
         include: [
-          { 
-            model: Etiqueta, 
-            as: 'etiquetas', 
-            attributes: [], 
-            through: { attributes: [] } 
+          {
+            model: Etiqueta,
+            as: 'etiquetas',
+            attributes: [],
+            through: { attributes: [] }
           }
         ],
         subQuery: false,
-        raw: true 
+        raw: true
       });
 
       const ids = publicacionesCoincidentes.map(p => p.id);
@@ -65,10 +65,14 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
 
       const { count, rows } = await Publicacion.findAndCountAll({
         where: {
-          id: { [Op.in]: ids } 
+          id: { [Op.in]: ids }
         },
         include: [
-          { model: Imagen, as: 'imagenes' },
+          {
+            model: Imagen,
+            as: 'imagenes',
+            where: logueado ? undefined : { copyrigth: false }
+          },
           { model: Etiqueta, as: 'etiquetas' }
         ],
         distinct: true
@@ -81,42 +85,44 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
     }
   }
 
-static async buscarUnaPublicacion(id) {
-  try {
-    const publicacion = await Publicacion.findByPk(id, {
-      include: [
-        {
-          model: Imagen,
-          as: "imagenes",
-          include: [
-            {
-              model: Comentario,
-              as: "comentarios", 
-              include: [{ model: Usuario, as: "usuario" }] // El que comentó
-            },
-            {
-              model: Valoracion,
-              as: "valoraciones"
-            }
-          ]
-        },
-        {
-          model: Etiqueta,
-          as: "etiquetas"
-        },
-        {
-          model: Usuario,
-          as: "creador" 
-        }
-      ]
-    });
+  static async buscarUnaPublicacion(id, logueado = false) {
+    try {
+      const publicacion = await Publicacion.findByPk(id, {
+        include: [
+          {
+            model: Imagen,
+            as: "imagenes",
+            where: logueado ? undefined : { copyrigth: false },
+            required: false,
+            include: [
+              {
+                model: Comentario,
+                as: "comentarios",
+                include: [{ model: Usuario, as: "usuario" }]
+              },
+              {
+                model: Valoracion,
+                as: "valoraciones"
+              }
+            ]
+          },
+          {
+            model: Etiqueta,
+            as: "etiquetas"
+          },
+          {
+            model: Usuario,
+            as: "creador"
+          }
+        ]
+      });
 
-    return publicacion;
-  } catch (err) {
-    console.error("Error al buscar la publicación por PK:", err);
-    throw err;
+      return publicacion;
+    } catch (err) {
+      console.error("Error al buscar la publicación por PK:", err);
+      throw err;
+    }
   }
-}
 
 }
 
