@@ -1,7 +1,18 @@
 import { Model,  DataTypes } from "sequelize";
 import {sequelize} from "../conexion.js";
 
-export class Denuncia_publicacion extends Model {}
+export class Denuncia_publicacion extends Model {
+
+static async creardenuncia(publicacionId, usuarioId, descripcion, motivo){
+  return Denuncia_publicacion.create({
+    publicacion_id: publicacionId,
+    user_id: usuarioId,
+    contenido: descripcion,
+    motivo,
+  });
+}
+
+}
 
 Denuncia_publicacion.init({
   
@@ -11,7 +22,7 @@ Denuncia_publicacion.init({
     primaryKey: true,
     allowNull: false,
   },
-  post_id: {
+  publicacion_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },

@@ -39,6 +39,21 @@ mixin publicacion(item,mensaje)
       .precioImagen {
         font-weight: bold;
       }
+
+      .mostrar {
+          display: none; /* Se vuelve 'flex' o 'block' con JS */
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5); /* Fondo negro semitransparente */
+          justify-content: center;
+          align-items: center;
+          z-index: 1000; /* Asegura que esté por encima de todo lo demás */
+      }
+
+
     div#publicacionparteuno
       if item.creador
         a(href="/perfil/" + item.creador.id style="text-decoration: none; color: inherit;")
@@ -71,11 +86,26 @@ mixin publicacion(item,mensaje)
           
       h1= item.titulo
       p= item.descripcion
+      button.abrir reportar
 
       if item.etiquetas && item.etiquetas.length > 0
         ul
           each etq in item.etiquetas
             li= etq.nombre
+
+    div.oculto
+      dialog.reporte
+        h2 formulario de reporte
+        form.formulariodereporte(action="/denunciarPublicacion" method="POST")
+          input(type="hidden" name="publicacion_id" value=item.id)
+          label(for="motivo") Motivo del reporte
+          select#motivo(name="motivo" required)
+            option(value="Copyright") Copyright
+            option(value="Inapropiado") contenido inapropiado
+          label(for="descripcion") Mas informacion
+          textarea#descripcion(name="descripcion" required placeholder="Cuentanos mas")
+          button(type="submit") Enviar
+
 
     div#publicacioncomentarios
       div
@@ -95,22 +125,21 @@ mixin publicacion(item,mensaje)
         const comentariosPermitidos = !{Boolean(item.comentarios_permitidos)};
         let index = 0;
 
-        const contenedor = document.querySelector('[data-post-id="' + '!{item.id}' + '"]');
-        if (!contenedor) return;
-
         // variables
-        const btnDerecha = contenedor.querySelector(".btn-derecha");
-        const btnIzquierda = contenedor.querySelector(".btn-izquierda");
-        const rangevoto = contenedor.querySelector(".valordevalorar");
-        const txtvoto = contenedor.querySelector(".valorTexto");
-        const elImagen = contenedor.querySelector(".imagenPrincipal");
-        const elPromedio = contenedor.querySelector(".promedio");
-        const elPrecio = contenedor.querySelector(".precioImagen");
-        const elContador = contenedor.querySelector(".contadorImagenes");
-        const cajaCmts = contenedor.querySelector(".cajaComentarios");
-        const inputsId = contenedor.querySelectorAll(".inputImagenId, .inputImagenId2");
-        const seguirAutor = contenedor.querySelector("#seguirautor");
-        const formComentario = contenedor.querySelector(".formComentario");
+        const btnDerecha = document.querySelector(".btn-derecha");
+        const btnIzquierda = document.querySelector(".btn-izquierda");
+        const rangevoto = document.querySelector(".valordevalorar");
+        const txtvoto = document.querySelector(".valorTexto");
+        const elImagen = document.querySelector(".imagenPrincipal");
+        const elPromedio = document.querySelector(".promedio");
+        const elPrecio = document.querySelector(".precioImagen");
+        const elContador = document.querySelector(".contadorImagenes");
+        const cajaCmts = document.querySelector(".cajaComentarios");
+        const inputsId = document.querySelectorAll(".inputImagenId, .inputImagenId2");
+        const seguirAutor = document.querySelector("#seguirautor");
+        const formComentario = document.querySelector(".formComentario");
+        const reporte = document.querySelector(".reporte");
+        const abrir = document.querySelector(".abrir");
 
         if (rangevoto && txtvoto) {
           rangevoto.addEventListener("input", function() {
@@ -226,5 +255,10 @@ mixin publicacion(item,mensaje)
           });
         }
 
-        //desactivar comentarios
+        // Abrir/cerrar modal de reporte
+        if (abrir && reporte) {
+          abrir.addEventListener("click", function() {
+            reporte.showModal();
+          });
+        }
       })();
