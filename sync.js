@@ -3,7 +3,7 @@ import { Coleccion } from "./modelos/Coleccion.js"
 import { Comentario } from "./modelos/Comentario.js"
 import { Compra } from "./modelos/Compra.js"
 import { Denuncia_comentario } from "./modelos/Denuncia_comentario.js"
-import { Denuncia_publicacion } from "./modelos/Denuncia_publicacion.js"
+import { Denuncia_imagen } from "./modelos/Denuncia_imagen.js"
 import { Denuncia_usuario } from "./modelos/Denuncia_usuario.js"
 import { Etiqueta } from "./modelos/Etiqueta.js"
 import { Favoritos } from "./modelos/Favoritos.js"
@@ -51,13 +51,13 @@ async function RelacionarTablas() {
     Usuario.belongsToMany(Publicacion, { through: Compra, as: "Compras", foreignKey: "usuario_id", otherKey: "publicacion_id" });
     Publicacion.belongsToMany(Usuario, { through: Compra, as: "Compras", foreignKey: "publicacion_id", otherKey: "usuario_id" });
 
-    // Denuncias de Publicación
-    Publicacion.hasMany(Denuncia_publicacion, { foreignKey: "publicacion_id" });
-    Denuncia_publicacion.belongsTo(Publicacion, { foreignKey: "publicacion_id" });
-    
     // Publicacion y imagen
     Publicacion.hasMany(Imagen, { as: "imagenes", foreignKey: "post_id" });
     Imagen.belongsTo(Publicacion, { foreignKey: "post_id" });
+
+    // Denuncias de imágenes
+    Imagen.hasMany(Denuncia_imagen, { foreignKey: "imagen_id" });
+    Denuncia_imagen.belongsTo(Imagen, { foreignKey: "imagen_id" });
 
     // Imagen y Comentario
     Imagen.hasMany(Comentario, { as: "comentarios", foreignKey: "imagen_id" });
@@ -103,8 +103,8 @@ async function RelacionarTablas() {
     Denuncia_usuario.hasMany(Notificacion, { foreignKey: "denuncia_usuario_id" });
     Notificacion.belongsTo(Denuncia_usuario, { foreignKey: "denuncia_usuario_id" });
 
-    Denuncia_publicacion.hasMany(Notificacion, { foreignKey: "denuncia_publicacion_id" });
-    Notificacion.belongsTo(Denuncia_publicacion, { foreignKey: "denuncia_publicacion_id" });
+    Denuncia_imagen.hasMany(Notificacion, { foreignKey: "denuncia_imagen_id" });
+    Notificacion.belongsTo(Denuncia_imagen, { foreignKey: "denuncia_imagen_id" });
 
     Denuncia_comentario.hasMany(Notificacion, { foreignKey: "denuncia_comentario_id" });
     Notificacion.belongsTo(Denuncia_comentario, { foreignKey: "denuncia_comentario_id" });

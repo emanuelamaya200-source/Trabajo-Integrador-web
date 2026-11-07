@@ -96,8 +96,8 @@ mixin publicacion(item,mensaje)
     div.oculto
       dialog.reporte
         h2 formulario de reporte
-        form.formulariodereporte(action="/denunciarPublicacion" method="POST")
-          input(type="hidden" name="publicacion_id" value=item.id)
+        form.formulariodereporte(action="/denunciarImagen" method="POST")
+          input.inputImagenDenuncia(type="hidden" name="imagen_id" value="")
           label(for="motivo") Motivo del reporte
           select#motivo(name="motivo" required)
             option(value="Copyright") Copyright
@@ -135,7 +135,7 @@ mixin publicacion(item,mensaje)
         const elPrecio = document.querySelector(".precioImagen");
         const elContador = document.querySelector(".contadorImagenes");
         const cajaCmts = document.querySelector(".cajaComentarios");
-        const inputsId = document.querySelectorAll(".inputImagenId, .inputImagenId2");
+        const inputsId = document.querySelectorAll(".inputImagenId, .inputImagenId2, .inputImagenDenuncia");
         const seguirAutor = document.querySelector("#seguirautor");
         const formComentario = document.querySelector(".formComentario");
         const reporte = document.querySelector(".reporte");

@@ -1,30 +1,39 @@
-import { Denuncia_publicacion } from "../modelos/Denuncia_publicacion.js";
-import { Publicacion } from "../modelos/Publicacion.js";
+import { UniqueConstraintError } from "sequelize";
+import { Denuncia_imagen } from "../modelos/Denuncia_imagen.js";
+import { Imagen } from "../modelos/Imagen.js";
 
-export const agregarDenunciaPublicacion = async (req, res) => {
+const motivosPermitidos = new Set(["Copyright", "Inapropiado"]);
+
+export const agregarDenunciaImagen = async (req, res) => {
     try {
-        const { publicacion_id, descripcion, motivo } = req.body;
+        const { imagen_id, descripcion, motivo } = req.body;
         const usuario_id = req.session.usuario.id;
+        const imagenId = Number(imagen_id);
+        const descripcionNormalizada = typeof descripcion === "string" ? descripcion.trim() : "";
 
-        if (!publicacion_id || !descripcion || !motivo) {
+        if (!Number.isInteger(imagenId) || imagenId <= 0 ||
+            !descripcionNormalizada || !motivosPermitidos.has(motivo)) {
             return res.status(400).send("Faltan datos para realizar la denuncia");
         }
 
-        const publicacion = await Publicacion.findByPk(publicacion_id);
-        if (!publicacion) {
-            return res.status(404).send("Publicación no encontrada");
+        const imagen = await Imagen.findByPk(imagenId);
+        if (!imagen) {
+            return res.status(404).send("Imagen no encontrada");
         }
 
-        await Denuncia_publicacion.creardenuncia(
-            publicacion.id,
+        await Denuncia_imagen.crearDenuncia(
+            imagen.id,
             usuario_id,
-            descripcion,
-            motivo
+            descripcionNormalizada,
+            motivo.trim()
         );
 
-        return res.redirect(`/verPublicacion/${publicacion.id}`);
+        return res.redirect(`/verPublicacion/${imagen.post_id}`);
     } catch (error) {
-        console.error("Error al crear la denuncia de publicación:", error);
+        if (error instanceof UniqueConstraintError) {
+            return res.status(409).send("Ya denunciaste esta imagen");
+        }
+        console.error("Error al crear la denuncia de imagen:", error);
         return res.status(500).send("No se pudo crear la denuncia");
     }
 };
