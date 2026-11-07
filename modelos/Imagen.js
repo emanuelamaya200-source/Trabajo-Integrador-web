@@ -16,6 +16,14 @@ export class Imagen extends Model {
     }
     catch (err) { console.log(err); }  
   }
+  static async retornarIDDeLaPublicacionDeUnaImagen(id_imagen, options = {}) {
+    const img = await Imagen.findByPk(id_imagen, options);
+    if (img == null) {
+      return null;
+    }
+
+    return img.post_id;
+  }
 }
 
 Imagen.init({
@@ -63,6 +71,11 @@ Imagen.init({
   texto_personalizado: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+    EstadoBloqueado: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
   },
 }, {
   sequelize,

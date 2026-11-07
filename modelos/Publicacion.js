@@ -124,6 +124,15 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
     }
   }
 
+  static async bloquearPorDenuncia(idPublicacion, options = {}) {
+    const publicacion = await Publicacion.findByPk(idPublicacion, options);
+    if (!publicacion) {
+      throw new Error(`No se encontró la publicación ${idPublicacion}`);
+    }
+
+    await publicacion.update({ bloqueada_por_denuncia: true }, options);
+    return publicacion;
+  }
 }
 
 Publicacion.init(
@@ -160,6 +169,11 @@ Publicacion.init(
       allowNull: true,
       defaultValue: true,
     },
+    bloqueada_por_denuncia: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
     cantidad_denuncias: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -175,6 +189,12 @@ Publicacion.init(
       allowNull: true,
       defaultValue: 0.0,
     },
+      EnviarAValidar: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    
   },
   {
     sequelize, 

@@ -1,14 +1,46 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../conexion.js";
+import { Imagen } from "./Imagen.js";
+import Publicacion from "./Publicacion.js";
 
 export class Denuncia_imagen extends Model {
-  static async crearDenuncia(imagenId, usuarioId, descripcion, motivo) {
+  static async crearDenuncia(imagenId, usuarioId, descripcion, motivo, options = {}) {
     return Denuncia_imagen.create({
       imagen_id: imagenId,
       user_id: usuarioId,
       descripcion,
       motivo,
+    }, options);
+  }
+  static async verSiTieneTresDenuncias(id_imagen, options = {}) {
+    const cantidad = await Denuncia_imagen.count({
+      where: { imagen_id: id_imagen },
+      distinct: true,
+      col: "user_id",
+      transaction: options.transaction,
     });
+
+    if (cantidad > 3) {
+      const idPublicacion = await Imagen.retornarIDDeLaPublicacionDeUnaImagen(
+        id_imagen,
+        { transaction: options.transaction }
+      );
+      if (idPublicacion == null) {
+        throw new Error(`No se encontró la imagen ${id_imagen}`);
+      }
+
+      const publicacion = await Publicacion.findByPk(idPublicacion, {
+        transaction: options.transaction,
+      });
+      if (!publicacion) {
+        throw new Error(`No se encontró la publicación ${idPublicacion}`);
+      }
+
+      publicacion.EnviarAValidar = true;
+      await publicacion.save({ transaction: options.transaction });
+    }
+
+    return cantidad;
   }
 }
 

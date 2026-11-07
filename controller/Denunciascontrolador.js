@@ -1,6 +1,8 @@
 import { UniqueConstraintError } from "sequelize";
+import { sequelize } from "../conexion.js";
 import { Denuncia_imagen } from "../modelos/Denuncia_imagen.js";
 import { Imagen } from "../modelos/Imagen.js";
+import { Publicacion } from "../modelos/Publicacion.js";
 
 const motivosPermitidos = new Set(["Copyright", "Inapropiado"]);
 
@@ -21,12 +23,19 @@ export const agregarDenunciaImagen = async (req, res) => {
             return res.status(404).send("Imagen no encontrada");
         }
 
-        await Denuncia_imagen.crearDenuncia(
-            imagen.id,
-            usuario_id,
-            descripcionNormalizada,
-            motivo.trim()
-        );
+        await sequelize.transaction(async (transaction) => {
+            await Denuncia_imagen.crearDenuncia(
+                imagen.id,
+                usuario_id,
+                descripcionNormalizada,
+                motivo,
+                { transaction }
+            );
+            // Bloquear la publicacion para que el autor no pueda modificarla.
+            await Publicacion.bloquearPorDenuncia(imagen.post_id, { transaction });
+            // Con mas de tres denuncias de usuarios distintos, se envia a validar la publicacion.
+            await Denuncia_imagen.verSiTieneTresDenuncias(imagen.id, { transaction });
+        });
 
         return res.redirect(`/verPublicacion/${imagen.post_id}`);
     } catch (error) {
