@@ -74,13 +74,14 @@ mixin publicacion(item,mensaje)
           p.copyright
           p.precioImagen(style="display: none;")
           
-          div.bloqueValorar
-            form(action="/crearValoracion" method="POST")
-              input.inputImagenId2(type='hidden' name='imagen_id' value="")
-              input.valordevalorar(type="range" min="1" max="10" value="5" name="valor")
-              input(type='hidden' name='post_id' value=item.id)
-              p.valorTexto Valor: 5
-              input(type="submit" value="Valorar")
+          if usuario && (!item.creador || usuario.id != item.creador.id)
+            div.bloqueValorar
+              form(action="/crearValoracion" method="POST")
+                input.inputImagenId2(type='hidden' name='imagen_id' value="")
+                input.valordevalorar(type="range" min="1" max="10" value="5" name="valor")
+                input(type='hidden' name='post_id' value=item.id)
+                p.valorTexto Valor: 5
+                input(type="submit" value="Valorar")
       else
         p Imagen no encontrada
           
@@ -201,7 +202,7 @@ mixin publicacion(item,mensaje)
           }
 
           if (elPromedio) {
-            elPromedio.textContent = "Promedio: " + promedio;
+            elPromedio.textContent = "Promedio: " + promedio + " | Valoraciones: " + votos.length;
           }
           
           if (rangevoto && txtvoto) {

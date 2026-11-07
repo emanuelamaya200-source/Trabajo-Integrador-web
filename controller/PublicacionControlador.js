@@ -3,8 +3,7 @@ import { Imagen } from '../modelos/Imagen.js';
 import { Comentario } from '../modelos/Comentario.js';
 import { Usuario } from '../modelos/Usuario.js';
 import { Valoracion } from '../modelos/Valoracion.js';
-import session from 'express-session';
-import { BOOLEAN } from 'sequelize';
+import { UniqueConstraintError } from 'sequelize';
 
 export const mostrarFormulario = (req, res) => {
     res.render("Publicaciones/crearPubli");
@@ -123,10 +122,37 @@ export const crearValoracion = async (req, res) => {
   try {
     const { valor, imagen_id, post_id } = req.body;
     const usuarioId = req.session.usuario.id;
-    await Valoracion.crearValoracion(imagen_id, usuarioId, valor);
+    const imagenId = Number(imagen_id);
+    const puntaje = Number(valor);
+    const publicacionId = Number(post_id);
+
+    if (!Number.isInteger(imagenId) || imagenId <= 0 ||
+        !Number.isInteger(puntaje) || puntaje < 1 || puntaje > 10 ||
+        !Number.isInteger(publicacionId) || publicacionId <= 0) {
+      return res.status(400).send("Datos de valoración inválidos");
+    }
+
+    const imagen = await Imagen.findByPk(imagenId);
+    if (!imagen || Number(imagen.post_id) !== publicacionId) {
+      return res.status(400).send("La imagen no pertenece a esta publicación");
+    }
+
+    await Valoracion.crearValoracion(imagenId, usuarioId, puntaje);
     return res.redirect(`/verPublicacion/${post_id}`);
 
   } catch (error) {
+    if (error.code === "AUTOR_NO_PUEDE_VALORAR") {
+      return res.status(403).send(error.message);
+    }
+    if (error.code === "VALORACION_DUPLICADA" || error instanceof UniqueConstraintError) {
+      return res.status(409).send("Ya valoraste esta imagen");
+    }
+    if (error.code === "IMAGEN_NO_ENCONTRADA" || error.code === "PUBLICACION_NO_ENCONTRADA") {
+      return res.status(404).send(error.message);
+    }
+    if (error.code === "VALORACION_INVALIDA") {
+      return res.status(400).send(error.message);
+    }
     console.error("Error en el controlador crearValoracion:", error);
     return res.status(500).send("Error interno al procesar la valoración");
   }
