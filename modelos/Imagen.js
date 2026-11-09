@@ -54,6 +54,11 @@ Imagen.init({
     defaultValue: false,
     allowNull: true,
   },
+  comentarios_permitidos: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  },
   licencia: {
     type: DataTypes.STRING,
     allowNull: true,

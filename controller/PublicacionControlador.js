@@ -79,44 +79,70 @@ export const verUnaPublicacion = async (req, res) => {
 };
 
 export const crearComentario = async (req, res) => {
-    const { post_id, imagen_id, contenido } = req.body; 
-
     try {
+        const { post_id, imagen_id, contenido } = req.body;
         const usuarioId = req.session.usuario.id;
-        const Publicacion = Publicacion.findByPk(post_id);
-        if(publicacion.comentarios_permitidos){
-            await Comentario.crearComentario(imagen_id, usuarioId, contenido);
-            return res.redirect(`/verPublicacion/${post_id}`);
-        }else{
-            if (post_id) {
-                console.error("Comentarios Desactivados", error);
-                return res.redirect(`/verPublicacion/${post_id}`);               
-            }
-            //por si acaso no hay id
-            return res.redirect("/");
+        const publicacionId = Number(post_id);
+        const imagenId = Number(imagen_id);
+        const contenidoNormalizado = typeof contenido === "string" ? contenido.trim() : "";
+
+        if (!Number.isInteger(publicacionId) || publicacionId <= 0 ||
+            !Number.isInteger(imagenId) || imagenId <= 0 ||
+            !contenidoNormalizado || contenidoNormalizado.length > 255) {
+            return res.status(400).send("El comentario no es válido");
         }
+
+        const imagen = await Imagen.findByPk(imagenId);
+        if (!imagen) {
+            return res.status(404).send("Imagen no encontrada");
+        }
+        if (Number(imagen.post_id) !== publicacionId) {
+            return res.status(400).send("La imagen no pertenece a esta publicación");
+        }
+
+        if (!imagen.comentarios_permitidos) {
+            return res.status(403).send("El autor cerró los comentarios de esta imagen");
+        }
+
+        await Comentario.crearComentario(imagenId, usuarioId, contenidoNormalizado);
+        return res.redirect(`/verPublicacion/${publicacionId}`);
     } catch (error) {
         console.error("Error al crearComentario:", error);
-        if (post_id) {
-            return res.redirect(`/verPublicacion/${post_id}`);
-        }
-        //por si acaso no hay id      
-        return res.redirect("/");
+        return res.status(500).send("No se pudo crear el comentario");
     }
 };
 
-export const desactivarComentarios = async (req,res) =>{
-    try{
-    const {post_id} = req.body;
-    const PublicacionACambiar = Publicacion.findByPk(post_id);
-    await PublicacionACambiar.reload();
-    PublicacionACambiar.comentariosPermitidos = false;
-    PublicacionACambiar.save();
-    }catch(error){
+export const cambiarEstadoComentarios = async (req, res) => {
+    try {
+        const publicacionId = Number(req.body.post_id);
+        const imagenId = Number(req.body.imagen_id);
+        if (!Number.isInteger(publicacionId) || publicacionId <= 0 ||
+            !Number.isInteger(imagenId) || imagenId <= 0) {
+            return res.status(400).send("Publicación o imagen no válida");
+        }
 
+        const publicacion = await Publicacion.findByPk(publicacionId);
+        if (!publicacion) {
+            return res.status(404).send("Publicación no encontrada");
+        }
+
+        if (Number(publicacion.usuario_id) !== Number(req.session.usuario.id)) {
+            return res.status(403).send("Solo el autor puede cambiar los comentarios");
+        }
+
+        const imagen = await Imagen.findByPk(imagenId);
+        if (!imagen || Number(imagen.post_id) !== publicacionId) {
+            return res.status(400).send("La imagen no pertenece a esta publicación");
+        }
+
+        imagen.comentarios_permitidos = !imagen.comentarios_permitidos;
+        await imagen.save();
+        return res.redirect(`/verPublicacion/${publicacion.id}`);
+    } catch (error) {
+        console.error("Error al cambiar el estado de los comentarios:", error);
+        return res.status(500).send("No se pudo actualizar el estado de los comentarios");
     }
-    
-}
+};
 
 export const crearValoracion = async (req, res) => {
   try {

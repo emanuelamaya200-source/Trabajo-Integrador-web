@@ -9,7 +9,7 @@ static async crearComentario(imagenId, usuarioId, contenidoTexto) {
         const nuevoComentario = await Comentario.create({
             imagen_id: imagenId,
             user_id: usuarioId,
-            contenido: contenidoTexto
+            contenido: contenidoTexto.trim()
         });
         return nuevoComentario;
     } catch (err) {
@@ -71,6 +71,10 @@ Comentario.init(
     contenido: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      validate: {
+        notEmpty: true,
+        len: [1, 255],
+      },
     },
   },
   {

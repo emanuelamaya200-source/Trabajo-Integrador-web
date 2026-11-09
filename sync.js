@@ -89,8 +89,12 @@ async function RelacionarTablas() {
     Validador.belongsTo(Publicacion, { foreignKey: "publicacion_id" });
   
     // Denuncias de comentarios
-    Comentario.hasMany(Denuncia_comentario, { foreignKey: "comentario_id" });
-    Denuncia_comentario.belongsTo(Comentario, { foreignKey: "comentario_id" });
+    Comentario.hasMany(Denuncia_comentario, { foreignKey: "comentario_id", as: "denuncias" });
+    Denuncia_comentario.belongsTo(Comentario, { foreignKey: "comentario_id", as: "comentario" });
+    Usuario.hasMany(Denuncia_comentario, { foreignKey: "user_id", as: "denunciasComentarios" });
+    Denuncia_comentario.belongsTo(Usuario, { foreignKey: "user_id", as: "denunciante" });
+    Publicacion.hasMany(Denuncia_comentario, { foreignKey: "post_id", as: "denunciasComentarios" });
+    Denuncia_comentario.belongsTo(Publicacion, { foreignKey: "post_id", as: "publicacion" });
 
     // Imagen y valoracion
     Imagen.hasMany(Valoracion, { as: "valoraciones", foreignKey: "imagen_id" });

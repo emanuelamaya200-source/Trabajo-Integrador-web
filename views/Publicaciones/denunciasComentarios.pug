@@ -1,0 +1,20 @@
+extends ../layout
+
+block content
+  h1 Comentarios denunciados
+
+  if denuncias.length === 0
+    p No hay comentarios denunciados.
+  else
+    each denuncia in denuncias
+      div
+        h2
+          a(href="/verPublicacion/" + denuncia.publicacion.id)= denuncia.publicacion.titulo
+        p Comentario:
+        p= denuncia.comentario.contenido
+        p Denunciado por: #{denuncia.denunciante.username}
+        p Motivo: #{denuncia.motivo}
+        p Descripción: #{denuncia.description}
+        form(action="/eliminarComentarioDenunciado" method="POST")
+          input(type="hidden" name="denuncia_id" value=denuncia.id)
+          button(type="submit") Eliminar mi comentario

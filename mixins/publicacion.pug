@@ -111,19 +111,29 @@ mixin publicacion(item,mensaje)
     div#publicacioncomentarios
       div
         h1 Comentarios
+        if usuario && item.creador && usuario.id == item.creador.id
+          form(action="/cambiarEstadoComentarios" method="POST")
+            input(type="hidden" name="post_id" value=item.id)
+            input.inputImagenComentarios(type="hidden" name="imagen_id" value="")
+            button.botonEstadoComentarios(type="submit") Cambiar comentarios
+          a(href="/misDenunciasComentarios") Revisar comentarios denunciados
         div.cajaComentarios
 
-      form.formComentario(action='/crearComentario' method='POST')
-        input(type='hidden' name='post_id' value=item.id)
-        input.inputImagenId(type='hidden' name='imagen_id' value="")
-        textarea(name='contenido' required placeholder="Escribe un comentario...")
-        input(type='submit' value='Comentar')
+      p.mensajeEstadoComentarios
+      if usuario
+        form.formComentario(action='/crearComentario' method='POST')
+          input(type='hidden' name='post_id' value=item.id)
+          input.inputImagenId(type='hidden' name='imagen_id' value="")
+          textarea(name='contenido' maxlength='255' required placeholder="Escribe un comentario...")
+          input(type='submit' value='Comentar')
+      else
+        p Iniciá sesión para comentar.
 
     script.
       (function() {
         const imagenes = !{JSON.stringify(item.imagenes || [])};
         const creadorId = "!{item.creador ? item.creador.id : ''}";
-        const comentariosPermitidos = !{Boolean(item.comentarios_permitidos)};
+        const usuarioActualId = !{usuario ? JSON.stringify(usuario.id) : 'null'};
         let index = 0;
 
         // variables
@@ -137,8 +147,11 @@ mixin publicacion(item,mensaje)
         const elContador = document.querySelector(".contadorImagenes");
         const cajaCmts = document.querySelector(".cajaComentarios");
         const inputsId = document.querySelectorAll(".inputImagenId, .inputImagenId2, .inputImagenDenuncia");
+        const inputImagenComentarios = document.querySelector(".inputImagenComentarios");
+        const formComentarios = document.querySelector(".formComentario");
+        const mensajeEstadoComentarios = document.querySelector(".mensajeEstadoComentarios");
+        const botonEstadoComentarios = document.querySelector(".botonEstadoComentarios");
         const seguirAutor = document.querySelector("#seguirautor");
-        const formComentario = document.querySelector(".formComentario");
         const reporte = document.querySelector(".reporte");
         const abrir = document.querySelector(".abrir");
 
@@ -189,6 +202,24 @@ mixin publicacion(item,mensaje)
           inputsId.forEach(function(input) {
             input.value = img.id || 0;
           });
+          if (inputImagenComentarios) {
+            inputImagenComentarios.value = img.id;
+          }
+
+          const comentariosPermitidos = Boolean(img.comentarios_permitidos);
+          if (formComentarios) {
+            formComentarios.hidden = !comentariosPermitidos;
+          }
+          if (mensajeEstadoComentarios) {
+            mensajeEstadoComentarios.textContent = comentariosPermitidos
+              ? ""
+              : "El autor cerró los comentarios de esta imagen.";
+          }
+          if (botonEstadoComentarios) {
+            botonEstadoComentarios.textContent = comentariosPermitidos
+              ? "Cerrar comentarios de esta imagen"
+              : "Abrir comentarios de esta imagen";
+          }
           
           const votos = img.valoraciones || [];
           let suma = 0;
@@ -211,22 +242,64 @@ mixin publicacion(item,mensaje)
           }
 
           const comentarios = img.comentarios || [];
-          let htmlComentarios = "";
+          cajaCmts.innerHTML = "";
 
           if (comentarios.length > 0) {
             comentarios.forEach(function(c) {
-              const nombreUsuario = c.usuario ? c.usuario.username : "Anonimo";
-              htmlComentarios += '<div class="comentario">';
-              htmlComentarios += '  <strong>' + nombreUsuario + ': </strong>';
-              htmlComentarios += '  <p>' + c.contenido + '</p>';
-              htmlComentarios += '</div>';
+              const comentario = document.createElement("div");
+              comentario.className = "comentario";
+
+              const autor = document.createElement("strong");
+              autor.textContent = (c.usuario ? c.usuario.username : "Anónimo") + ": ";
+              comentario.appendChild(autor);
+
+              const contenido = document.createElement("p");
+              contenido.textContent = c.contenido;
+              comentario.appendChild(contenido);
+
+              if (usuarioActualId !== null &&
+                  Number(c.user_id) !== Number(usuarioActualId) &&
+                  Number(c.user_id) !== Number(creadorId)) {
+                const formulario = document.createElement("form");
+                formulario.method = "POST";
+                formulario.action = "/denunciarComentario";
+
+                const idComentario = document.createElement("input");
+                idComentario.type = "hidden";
+                idComentario.name = "comentario_id";
+                idComentario.value = c.id;
+                formulario.appendChild(idComentario);
+
+                const motivo = document.createElement("select");
+                motivo.name = "motivo";
+                motivo.required = true;
+                motivo.innerHTML = "<option value=''>Elegí un motivo</option>" +
+                  "<option value='Inapropiado'>Contenido inapropiado</option>" +
+                  "<option value='Spam'>Spam</option>" +
+                  "<option value='Ofensivo'>Contenido ofensivo</option>" +
+                  "<option value='Otro'>Otro</option>";
+                formulario.appendChild(motivo);
+
+                const descripcion = document.createElement("textarea");
+                descripcion.name = "descripcion";
+                descripcion.maxLength = 255;
+                descripcion.required = true;
+                descripcion.placeholder = "Explicá por qué denunciás este comentario";
+                formulario.appendChild(descripcion);
+
+                const enviarDenuncia = document.createElement("button");
+                enviarDenuncia.type = "submit";
+                enviarDenuncia.textContent = "Denunciar comentario";
+                formulario.appendChild(enviarDenuncia);
+                comentario.appendChild(formulario);
+              }
+
+              cajaCmts.appendChild(comentario);
             });
           } else {
-            htmlComentarios = "<p>No hay comentarios aún.</p>";
-          }
-
-          if (cajaCmts) {
-            cajaCmts.innerHTML = htmlComentarios;
+            const mensaje = document.createElement("p");
+            mensaje.textContent = "No hay comentarios aún.";
+            cajaCmts.appendChild(mensaje);
           }
         }
 
@@ -245,15 +318,6 @@ mixin publicacion(item,mensaje)
             });
           }
           cargarDatos();
-        }
-
-        //desactivar comentar si estan desabilitados
-
-        if (!comentariosPermitidos && formComentario) {
-          const elementosForm = formComentario.querySelectorAll("textarea, input[type='submit']");
-          elementosForm.forEach(function(el) {
-            el.setAttribute("disabled", "true");
-          });
         }
 
         // Abrir/cerrar modal de reporte
