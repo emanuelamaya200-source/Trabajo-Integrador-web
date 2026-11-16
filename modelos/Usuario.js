@@ -117,6 +117,11 @@ Usuario.init(
       allowNull: true,
       defaultValue: false,
     },
+    validador:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,

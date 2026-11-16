@@ -11,6 +11,7 @@ mixin navSinUsuario(className = "navsinc")
     li
       a#registrarse(href='/registro') Registrarse
 
+    if usuario.validador
   script.
     const buscar = document.querySelector("#buscar");
     buscar.addEventListener('keydown', (e) => {

@@ -11,6 +11,15 @@ mixin nav(className = "navc")
     li
       if usuario
         a#perfil(href=`/perfil/${usuario.id}`) Ver Perfil
+    li 
+      if usuario.validador 
+
+        button(popovertarget="menu") Opciones De Administrador ▾
+
+          div#menu(popover)
+            a(href="/denunciaComentarios") Denuncia De Comentarios
+            a(href="/denunciaImagenes") Denuncia De Imagenes
+            button(data-accion="eliminar") Eliminar
 
   script.
     const buscar = document.querySelector("#buscar");
@@ -18,4 +27,10 @@ mixin nav(className = "navc")
       if (e.key === 'Enter') {
         window.location.href = `/Buscar/${buscar.value}`;
       }
+    const menu = document.getElementById('menu');
+            menu.addEventListener('click', (e) => {
+              if (!e.target.dataset.accion) return;
+              console.log(e.target.dataset.accion);
+              menu.hidePopover();
+            }
     });

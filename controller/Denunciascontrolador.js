@@ -126,8 +126,9 @@ export const verDenunciasComentarios = async (req, res) => {
             ],
             order: [["createdAt", "DESC"]],
         });
-
-        return res.render("Publicaciones/denunciasComentarios", { denuncias });
+        if (req.session.usuario.validador) {
+            return res.render("Publicaciones/denunciasComentarios", { denuncias });
+        }
     } catch (error) {
         console.error("Error al cargar las denuncias de comentarios:", error);
         return res.status(500).send("No se pudieron cargar las denuncias");
@@ -165,5 +166,37 @@ export const eliminarComentarioDenunciado = async (req, res) => {
     } catch (error) {
         console.error("Error al eliminar comentario denunciado:", error);
         return res.status(500).send("No se pudo eliminar el comentario");
+    }
+};
+
+export const verDenunciasImagenes = async (req, res) => {   
+    try {
+        const denuncias = await Denuncia_imagen.findAll({
+            where: { estado: true },
+            include: [
+                {
+                    model: Imagen,
+                    as: "imagen",
+                    attributes: ["id", "titulo"],
+                    include: [{
+                        model: Publicacion,
+                        as: "publicacion",
+                        attributes: ["id", "titulo"],
+                    }],
+                },
+                {
+                    model: Usuario,
+                    as: "denunciante",
+                    attributes: ["id", "username"],
+                },
+            ],
+            order: [["createdAt", "DESC"]],
+        });
+        if (req.session.usuario.validador) {
+            return res.render("Publicaciones/denunciasImagenes", { denuncias });
+        }
+    } catch (error) {
+        console.error("Error al cargar las denuncias de imagenes:", error);
+        return res.status(500).send("No se pudieron cargar las denuncias de imagenes");
     }
 };
