@@ -9,6 +9,7 @@ import Publicaciones from"./rutas/Publicaciones.js"
 import RegYLogin from"./rutas/RegYLogin.js"
 import { requireAuth } from './controller/autenticador.js';
 import perfil from './rutas/perfil.js';
+import Denuncias from './rutas/Denuncias.js';
 
 // CONSTANTES
 const PORT = process.env.PORT;
@@ -51,6 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(RegYLogin);
 app.use(Publicaciones)
 app.use(perfil)
+app.use(Denuncias)
 
 // rutas
 app.get("/",(req, res , next)=>{

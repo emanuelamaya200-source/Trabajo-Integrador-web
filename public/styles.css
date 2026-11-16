@@ -32,6 +32,34 @@
 .navsinc #buscar, .navc #buscar {
     color: black;
 }
+
+.menu-administrador {
+    position: relative;
+}
+
+.menu-administrador summary {
+    cursor: pointer;
+    color: rgb(0, 19, 61);
+}
+
+.opciones-administrador {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+    min-width: 190px;
+    padding: 8px;
+    background: white;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+
+.opciones-administrador a {
+    display: block;
+    padding: 6px 4px;
+    white-space: nowrap;
+}
+
 .fila{
     display: flex;
     flex-direction: row;

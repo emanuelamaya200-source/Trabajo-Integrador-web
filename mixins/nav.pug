@@ -5,32 +5,26 @@ mixin nav(className = "navc")
     li
       a(href='/explorar') Explorar
     li
-      input#buscar(type="text", name="Buscar" placeholder="Buscar")
+      input#buscar(type="text", name="Buscar", placeholder="Buscar")
     li
       a(href='/crearPublicacion') Crear Publicación
-    li
-      if usuario
+    if usuario
+      li
         a#perfil(href=`/perfil/${usuario.id}`) Ver Perfil
-    li 
-      if usuario.validador 
-
-        button(popovertarget="menu") Opciones De Administrador ▾
-
-          div#menu(popover)
-            a(href="/denunciaComentarios") Denuncia De Comentarios
-            a(href="/denunciaImagenes") Denuncia De Imagenes
-            button(data-accion="eliminar") Eliminar
+    if usuario.validador
+      li
+        details.menu-administrador
+          summary Opciones de administrador
+          div.opciones-administrador
+            a(href="/denunciasComentarios") Denuncias de comentarios
+            a(href="/denunciasImagenes") Denuncias de imágenes
 
   script.
     const buscar = document.querySelector("#buscar");
-    buscar.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        window.location.href = `/Buscar/${buscar.value}`;
-      }
-    const menu = document.getElementById('menu');
-            menu.addEventListener('click', (e) => {
-              if (!e.target.dataset.accion) return;
-              console.log(e.target.dataset.accion);
-              menu.hidePopover();
-            }
-    });
+    if (buscar) {
+      buscar.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && buscar.value.trim()) {
+          window.location.href = `/Buscar/${encodeURIComponent(buscar.value.trim())}`;
+        }
+      });
+    }

@@ -1,11 +1,5 @@
 import express from 'express';
 import * as controller from '../controller/PublicacionControlador.js';
-import {
-    agregarDenunciaComentario,
-    agregarDenunciaImagen,
-    eliminarComentarioDenunciado,
-    verDenunciasComentarios
-} from '../controller/Denunciascontrolador.js';
 import { requireAuth } from '../controller/autenticador.js';
 
 const router = express.Router();
@@ -20,15 +14,9 @@ router.get("/Buscar/:busqueda", controller.buscarPublicaciones);
 //ver una sola publicacion
 router.get("/verPublicacion/:id", controller.verUnaPublicacion);
 
-//denunciar imagen
-router.post("/denunciarImagen", requireAuth, agregarDenunciaImagen);
-
 //crear comentario
 router.post("/crearComentario", requireAuth, controller.crearComentario);
 router.post("/cambiarEstadoComentarios", requireAuth, controller.cambiarEstadoComentarios);
-router.post("/denunciarComentario", requireAuth, agregarDenunciaComentario);
-router.get("/misDenunciasComentarios", requireAuth, verDenunciasComentarios);
-router.post("/eliminarComentarioDenunciado", requireAuth, eliminarComentarioDenunciado);
 
 //crear valoracion
 router.post("/crearValoracion",requireAuth,controller.crearValoracion)

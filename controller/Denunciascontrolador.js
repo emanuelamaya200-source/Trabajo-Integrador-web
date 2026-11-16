@@ -100,13 +100,14 @@ export const agregarDenunciaComentario = async (req, res) => {
 
 export const verDenunciasComentarios = async (req, res) => {
     try {
+        const esValidador = req.session.usuario.validador;
         const denuncias = await Denuncia_comentario.findAll({
             where: { estado: true },
             include: [
                 {
                     model: Comentario,
                     as: "comentario",
-                    where: { user_id: req.session.usuario.id },
+                    where: esValidador ? undefined : { user_id: req.session.usuario.id },
                     include: [{
                         model: Usuario,
                         as: "usuario",
@@ -126,9 +127,7 @@ export const verDenunciasComentarios = async (req, res) => {
             ],
             order: [["createdAt", "DESC"]],
         });
-        if (req.session.usuario.validador) {
-            return res.render("Publicaciones/denunciasComentarios", { denuncias });
-        }
+        return res.render("Publicaciones/denunciasComentarios", { denuncias });
     } catch (error) {
         console.error("Error al cargar las denuncias de comentarios:", error);
         return res.status(500).send("No se pudieron cargar las denuncias");
@@ -171,13 +170,17 @@ export const eliminarComentarioDenunciado = async (req, res) => {
 
 export const verDenunciasImagenes = async (req, res) => {   
     try {
+        if (!req.session.usuario.validador) {
+            return res.status(403).send("No tenés permiso para ver estas denuncias");
+        }
+
         const denuncias = await Denuncia_imagen.findAll({
-            where: { estado: true },
+            where: { estado: "pendiente" },
             include: [
                 {
                     model: Imagen,
                     as: "imagen",
-                    attributes: ["id", "titulo"],
+                    attributes: ["id", "url"],
                     include: [{
                         model: Publicacion,
                         as: "publicacion",
@@ -192,9 +195,7 @@ export const verDenunciasImagenes = async (req, res) => {
             ],
             order: [["createdAt", "DESC"]],
         });
-        if (req.session.usuario.validador) {
-            return res.render("Publicaciones/denunciasImagenes", { denuncias });
-        }
+        return res.render("Publicaciones/denunciasImagenes", { denuncias });
     } catch (error) {
         console.error("Error al cargar las denuncias de imagenes:", error);
         return res.status(500).send("No se pudieron cargar las denuncias de imagenes");

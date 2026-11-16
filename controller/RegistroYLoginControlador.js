@@ -19,7 +19,8 @@ export const LoguearsePost = async (req, res) => {
             req.session.usuario = {
                 id: usuario.id,
                 username: usuario.username,
-                email: usuario.email
+                email: usuario.email,
+                validador: usuario.validador
             };
 
             return res.render('extra/welcome', { nombre: usuario.username }); 

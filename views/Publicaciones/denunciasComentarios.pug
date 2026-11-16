@@ -1,7 +1,10 @@
 extends ../layout
 
 block content
-  h1 Comentarios denunciados
+  if usuario && usuario.validador
+    h1 Denuncias de comentarios
+  else
+    h1 Denuncias sobre tus comentarios
 
   if denuncias.length === 0
     p No hay comentarios denunciados.
@@ -15,6 +18,7 @@ block content
         p Denunciado por: #{denuncia.denunciante.username}
         p Motivo: #{denuncia.motivo}
         p Descripción: #{denuncia.description}
-        form(action="/eliminarComentarioDenunciado" method="POST")
-          input(type="hidden" name="denuncia_id" value=denuncia.id)
-          button(type="submit") Eliminar mi comentario
+        if usuario && usuario.id == denuncia.comentario.user_id
+          form(action="/eliminarComentarioDenunciado" method="POST")
+            input(type="hidden" name="denuncia_id" value=denuncia.id)
+            button(type="submit") Eliminar mi comentario

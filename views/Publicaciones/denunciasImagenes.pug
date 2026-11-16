@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  h1 Denuncias de imágenes
+
+  if denuncias.length === 0
+    p No hay denuncias pendientes.
+  else
+    each denuncia in denuncias
+      article
+        h2
+          a(href="/verPublicacion/" + denuncia.imagen.publicacion.id)= denuncia.imagen.publicacion.titulo
+        img.imagen-denunciada(src=denuncia.imagen.url, alt="Imagen denunciada")
+        p Denunciado por: #{denuncia.denunciante.username}
+        p Motivo: #{denuncia.motivo}
+        p Descripción: #{denuncia.descripcion}

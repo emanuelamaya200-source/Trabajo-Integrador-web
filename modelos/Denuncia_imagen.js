@@ -20,7 +20,7 @@ export class Denuncia_imagen extends Model {
       transaction: options.transaction,
     });
 
-    if (cantidad > 3) {
+    if (cantidad >= 3) {
       const idPublicacion = await Imagen.retornarIDDeLaPublicacionDeUnaImagen(
         id_imagen,
         { transaction: options.transaction }

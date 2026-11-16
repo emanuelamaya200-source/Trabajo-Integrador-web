@@ -5,17 +5,18 @@ mixin navSinUsuario(className = "navsinc")
     li
       a(href='/explorar') Explorar
     li
-      input#buscar(type="text", name="Buscar" placeholder="Buscar")
+      input#buscar(type="text", name="Buscar", placeholder="Buscar")
     li
       a#iniciar(href='/unirse') Iniciar Sesion
     li
       a#registrarse(href='/registro') Registrarse
 
-    if usuario.validador
   script.
     const buscar = document.querySelector("#buscar");
-    buscar.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        window.location.href = `/Buscar/${buscar.value}`;
-      }
-    });
+    if (buscar) {
+      buscar.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && buscar.value.trim()) {
+          window.location.href = `/Buscar/${encodeURIComponent(buscar.value.trim())}`;
+        }
+      });
+    }

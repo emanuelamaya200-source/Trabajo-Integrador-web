@@ -1,16 +1,20 @@
-import { sequelize } from "../conexion.js";
 import { requireAuth } from "../controller/autenticador.js";
-import express from "express"
-import * as Den from "../controller/Denunciascontrolador.js"
+import express from "express";
+import {
+    agregarDenunciaComentario,
+    agregarDenunciaImagen,
+    eliminarComentarioDenunciado,
+    verDenunciasComentarios,
+    verDenunciasImagenes,
+} from "../controller/Denunciascontrolador.js";
 
 const router = express.Router();
 
-router.get("/DenunciarImagen/:id", requireAuth, Den.agregarDenunciaImagen)
-router.post("/DenunciarComentario/:id", requireAuth, Den.agregarDenunciaComentario)
-router.get("/DenunciasComentarios", requireAuth, Den.verDenunciasComentarios)
-router.post("/eliminarComentarioDenunciado/:id", requireAuth, Den.eliminarComentarioDenunciado)
-router.get("/VerDenunciasComentarios", requireAuth, Den.verDenunciasComentarios)
-router.get("/DenunciasImagenes", requireAuth, Den.verDenunciasImagenes)
-
+router.post("/denunciarImagen", requireAuth, agregarDenunciaImagen);
+router.post("/denunciarComentario", requireAuth, agregarDenunciaComentario);
+router.get("/denunciasComentarios", requireAuth, verDenunciasComentarios);
+router.get("/misDenunciasComentarios", requireAuth, verDenunciasComentarios);
+router.get("/denunciasImagenes", requireAuth, verDenunciasImagenes);
+router.post("/eliminarComentarioDenunciado", requireAuth, eliminarComentarioDenunciado);
 
 export default router;
