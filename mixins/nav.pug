@@ -11,6 +11,13 @@ mixin nav(className = "navc")
     if usuario
       li
         a#perfil(href=`/perfil/${usuario.id}`) Ver Perfil
+      li
+        details.menu-administrador
+          summary Mi actividad
+          div.opciones-administrador
+            a(href="/misFavoritos") Mis favoritos
+            a(href="/misColecciones") Mis colecciones
+            a(href="/misCompras") Mis compras
     if usuario.validador
       li
         details.menu-administrador
@@ -18,6 +25,7 @@ mixin nav(className = "navc")
           div.opciones-administrador
             a(href="/denunciasComentarios") Denuncias de comentarios
             a(href="/denunciasImagenes") Denuncias de imágenes
+            a(href="/denunciasUsuarios") Denuncias de usuarios
 
   script.
     const buscar = document.querySelector("#buscar");

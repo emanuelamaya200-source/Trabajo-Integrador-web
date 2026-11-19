@@ -1,0 +1,12 @@
+extends ../layout
+include ../../mixins/publicaciones.pug
+
+block content
+  h1 Mis compras
+
+  if compras.length === 0
+    p Todavía no compraste publicaciones.
+  else
+    each compra in compras
+      if compra.publicacion
+        +publicaciones(compra.publicacion)

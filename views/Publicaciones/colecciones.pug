@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  h1 Mis colecciones
+
+  form(action="/crearColeccion" method="POST")
+    label(for="titulo") Título
+    input#titulo(type="text" name="titulo" required)
+    label(for="categoria") Categoría
+    input#categoria(type="text" name="categoria" required)
+    label
+      input(type="checkbox" name="publico")
+      | Colección pública
+    button(type="submit") Crear colección
+
+  if colecciones.length === 0
+    p Todavía no creaste colecciones.
+  else
+    ul
+      each coleccion in colecciones
+        li
+          a(href="/coleccion/" + coleccion.id)= coleccion.titulo
+          |  - #{coleccion.categoria}

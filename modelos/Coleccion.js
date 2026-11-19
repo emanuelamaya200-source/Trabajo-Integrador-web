@@ -19,9 +19,18 @@ Coleccion.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        usuario_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: "usuarios",
+                key: "id",
+            },
+        },
         publico: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
+            defaultValue: false,
         },
     },
     {

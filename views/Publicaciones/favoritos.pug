@@ -1,0 +1,12 @@
+extends ../layout
+include ../../mixins/publicaciones.pug
+
+block content
+  h1 Mis favoritos
+
+  if favoritos.length === 0
+    p Todavía no guardaste publicaciones.
+  else
+    each favorito in favoritos
+      if favorito.publicacion
+        +publicaciones(favorito.publicacion)

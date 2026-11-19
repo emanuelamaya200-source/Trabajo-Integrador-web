@@ -1,0 +1,17 @@
+extends ../layout
+
+block content
+  h1 Denuncias de usuarios
+
+  if denuncias.length === 0
+    p No hay denuncias pendientes.
+  else
+    each denuncia in denuncias
+      article
+        h2 Usuario denunciado: #{denuncia.denunciado.username}
+        p Denunciado por: #{denuncia.denunciante.username}
+        p Motivo: #{denuncia.motivo}
+        p Descripción: #{denuncia.description}
+        form(action="/resolverDenunciaUsuario" method="POST")
+          input(type="hidden" name="denuncia_id" value=denuncia.id)
+          button(type="submit") Marcar revisada

@@ -71,6 +71,17 @@ block content
             form
                 input#user(type="hidden", name="id_usuario", value=usuario.id)
                 input#seguir(type="button", name="seguir", value="Seguir")
+            form(action="/denunciarUsuario" method="POST")
+                input(type="hidden" name="usuario_id" value=usuario.id)
+                label(for="motivoDenunciaUsuario") Motivo de la denuncia
+                select#motivoDenunciaUsuario(name="motivo" required)
+                    option(value="") Elegí un motivo
+                    option(value="Acoso") Acoso
+                    option(value="Spam") Spam
+                    option(value="Suplantación") Suplantación
+                    option(value="Otro") Otro
+                textarea(name="descripcion" maxlength="255" required placeholder="Contá qué pasó")
+                button(type="submit") Denunciar usuario
     
     if !esMiPerfil
         script.

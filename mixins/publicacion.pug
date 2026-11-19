@@ -87,6 +87,17 @@ mixin publicacion(item,mensaje)
           
       h1= item.titulo
       p= item.descripcion
+      if usuario
+        form(action="/alternarFavorito/" + item.id method="POST")
+          button(type="submit") Agregar o quitar de favoritos
+        - var sePuedeComprar = false
+        if item.imagenes
+          each imagen in item.imagenes
+            if Number(imagen.Precio) > 0
+              - sePuedeComprar = true
+        if sePuedeComprar
+          form(action="/comprarPublicacion/" + item.id method="POST")
+            button(type="submit") Comprar publicación
       button.abrir reportar
 
       if item.etiquetas && item.etiquetas.length > 0

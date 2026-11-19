@@ -1,0 +1,27 @@
+extends ../layout
+include ../../mixins/publicaciones.pug
+
+block content
+  h1= coleccion.titulo
+  p Categoría: #{coleccion.categoria}
+  p= coleccion.publico ? "Pública" : "Privada"
+
+  if esPropietario
+    form(action="/agregarPublicacionColeccion" method="POST")
+      input(type="hidden" name="coleccion_id" value=coleccion.id)
+      label(for="publicacion_id") Agregar una publicación
+      select#publicacion_id(name="publicacion_id" required)
+        each publicacion in publicacionesDisponibles
+          option(value=publicacion.id)= publicacion.titulo
+      button(type="submit") Agregar
+
+  if coleccion.publicaciones.length === 0
+    p Esta colección todavía no tiene publicaciones.
+  else
+    each publicacion in coleccion.publicaciones
+      +publicaciones(publicacion)
+      if esPropietario
+        form(action="/quitarPublicacionColeccion" method="POST")
+          input(type="hidden" name="coleccion_id" value=coleccion.id)
+          input(type="hidden" name="publicacion_id" value=publicacion.id)
+          button(type="submit") Quitar de la colección

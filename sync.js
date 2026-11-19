@@ -1,5 +1,6 @@
 import { sequelize } from "./conexion.js"
 import { Coleccion } from "./modelos/Coleccion.js"
+import { ColeccionPublicacion } from "./modelos/ColeccionPublicacion.js"
 import { Comentario } from "./modelos/Comentario.js"
 import { Compra } from "./modelos/Compra.js"
 import { Denuncia_comentario } from "./modelos/Denuncia_comentario.js"
@@ -41,15 +42,35 @@ async function RelacionarTablas() {
     Usuario.hasMany(Coleccion, { foreignKey: "usuario_id" });
     Coleccion.belongsTo(Usuario, { foreignKey: "usuario_id" });
 
-    Usuario.hasMany(Denuncia_usuario, { foreignKey: "usuario_id" });
-    Denuncia_usuario.belongsTo(Usuario, { foreignKey: "usuario_id" });
+    Usuario.hasMany(Denuncia_usuario, { foreignKey: "denunciante_id", as: "denunciasRealizadas" });
+    Denuncia_usuario.belongsTo(Usuario, { foreignKey: "denunciante_id", as: "denunciante" });
+    Usuario.hasMany(Denuncia_usuario, { foreignKey: "user_id", as: "denunciasRecibidas" });
+    Denuncia_usuario.belongsTo(Usuario, { foreignKey: "user_id", as: "denunciado" });
    
     // Favoritos y Compras
     Usuario.belongsToMany(Publicacion, { through: Favoritos, as: "Favoritos", foreignKey: "usuario_id", otherKey: "publicacion_id" });
     Publicacion.belongsToMany(Usuario, { through: Favoritos, as: "Favoritos", foreignKey: "publicacion_id", otherKey: "usuario_id" });
+    Favoritos.belongsTo(Publicacion, { foreignKey: "publicacion_id", as: "publicacion" });
+    Favoritos.belongsTo(Usuario, { foreignKey: "usuario_id", as: "usuario" });
     
-    Usuario.belongsToMany(Publicacion, { through: Compra, as: "Compras", foreignKey: "usuario_id", otherKey: "publicacion_id" });
-    Publicacion.belongsToMany(Usuario, { through: Compra, as: "Compras", foreignKey: "publicacion_id", otherKey: "usuario_id" });
+    Usuario.belongsToMany(Publicacion, { through: Compra, as: "Compras", foreignKey: "user_id", otherKey: "post_id" });
+    Publicacion.belongsToMany(Usuario, { through: Compra, as: "Compradores", foreignKey: "post_id", otherKey: "user_id" });
+    Compra.belongsTo(Publicacion, { foreignKey: "post_id", as: "publicacion" });
+    Compra.belongsTo(Usuario, { foreignKey: "user_id", as: "comprador" });
+
+    // Colecciones y publicaciones
+    Coleccion.belongsToMany(Publicacion, {
+      through: ColeccionPublicacion,
+      as: "publicaciones",
+      foreignKey: "coleccion_id",
+      otherKey: "publicacion_id",
+    });
+    Publicacion.belongsToMany(Coleccion, {
+      through: ColeccionPublicacion,
+      as: "colecciones",
+      foreignKey: "publicacion_id",
+      otherKey: "coleccion_id",
+    });
 
     // Publicacion y imagen
     Publicacion.hasMany(Imagen, { as: "imagenes", foreignKey: "post_id" });

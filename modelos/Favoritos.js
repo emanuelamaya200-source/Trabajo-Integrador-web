@@ -5,12 +5,33 @@ export class Favoritos extends Model {}
 
 Favoritos.init(
   {
+    usuario_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "usuarios",
+        key: "id",
+      },
+    },
+    publicacion_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "publicaciones",
+        key: "id",
+      },
+    },
   },
   {
     sequelize,
     modelName: "favoritos",
     tableName: "favoritos",
-    createdAt: true,
-    deletedAt: true,
+    timestamps: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ["usuario_id", "publicacion_id"],
+      },
+    ],
   },
 );

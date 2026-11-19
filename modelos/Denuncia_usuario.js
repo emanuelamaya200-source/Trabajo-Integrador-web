@@ -13,6 +13,18 @@ Denuncia_usuario.init({
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    references: {
+      model: "usuarios",
+      key: "id",
+    },
+  },
+  denunciante_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: "usuarios",
+      key: "id",
+    },
   },    
   contenido: {
     type: DataTypes.STRING(255),
@@ -28,12 +40,18 @@ Denuncia_usuario.init({
   },
   estado: {
     type: DataTypes.BOOLEAN,
-    allowNull: true,
+    allowNull: false,
+    defaultValue: true,
   },
 }, {
   sequelize,
   modelName: "denuncia_usuario",
   tableName: "denuncias_usuarios",
-  createdAt: true,
-  deletedAt: true,
+  timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ["user_id", "denunciante_id"],
+    },
+  ],
 });

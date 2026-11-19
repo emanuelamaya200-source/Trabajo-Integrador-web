@@ -2,12 +2,100 @@ import { UniqueConstraintError } from "sequelize";
 import { sequelize } from "../conexion.js";
 import { Denuncia_imagen } from "../modelos/Denuncia_imagen.js";
 import { Denuncia_comentario } from "../modelos/Denuncia_comentario.js";
+import { Denuncia_usuario } from "../modelos/Denuncia_usuario.js";
 import { Imagen } from "../modelos/Imagen.js";
 import { Publicacion } from "../modelos/Publicacion.js";
 import { Comentario } from "../modelos/Comentario.js";
 import { Usuario } from "../modelos/Usuario.js";
 
 const motivosPermitidos = new Set(["Copyright", "Inapropiado"]);
+const motivosDenunciaUsuario = ["Acoso", "Spam", "Suplantación", "Otro"];
+
+export const agregarDenunciaUsuario = async (req, res) => {
+    try {
+        const usuarioDenunciadoId = Number(req.body.usuario_id);
+        const usuarioDenuncianteId = req.session.usuario.id;
+        const motivo = req.body.motivo;
+        const descripcion = String(req.body.descripcion || "").trim();
+
+        if (!Number.isInteger(usuarioDenunciadoId) || usuarioDenunciadoId <= 0 ||
+            !motivosDenunciaUsuario.includes(motivo) || !descripcion || descripcion.length > 255) {
+            return res.status(400).send("Completá los datos de la denuncia");
+        }
+
+        if (Number(usuarioDenunciadoId) === Number(usuarioDenuncianteId)) {
+            return res.status(400).send("No podés denunciar tu propio usuario");
+        }
+
+        const usuarioDenunciado = await Usuario.findByPk(usuarioDenunciadoId);
+        if (!usuarioDenunciado) {
+            return res.status(404).send("Usuario no encontrado");
+        }
+
+        await Denuncia_usuario.create({
+            user_id: usuarioDenunciadoId,
+            denunciante_id: usuarioDenuncianteId,
+            contenido: usuarioDenunciado.username,
+            description: descripcion,
+            motivo,
+        });
+
+        return res.redirect(`/perfil/${usuarioDenunciadoId}`);
+    } catch (error) {
+        if (error instanceof UniqueConstraintError) {
+            return res.status(409).send("Ya denunciaste a este usuario");
+        }
+        console.error("Error al denunciar usuario:", error);
+        return res.status(500).send("No se pudo crear la denuncia");
+    }
+};
+
+export const verDenunciasUsuarios = async (req, res) => {
+    try {
+        if (!req.session.usuario.validador) {
+            return res.status(403).send("Solo un validador puede ver estas denuncias");
+        }
+
+        const denuncias = await Denuncia_usuario.findAll({
+            where: { estado: true },
+            include: [
+                { model: Usuario, as: "denunciante", attributes: ["id", "username"] },
+                { model: Usuario, as: "denunciado", attributes: ["id", "username"] },
+            ],
+            order: [["createdAt", "DESC"]],
+        });
+
+        return res.render("Publicaciones/denunciasUsuarios", { denuncias });
+    } catch (error) {
+        console.error("Error al cargar las denuncias de usuarios:", error);
+        return res.status(500).send("No se pudieron cargar las denuncias");
+    }
+};
+
+export const resolverDenunciaUsuario = async (req, res) => {
+    try {
+        if (!req.session.usuario.validador) {
+            return res.status(403).send("Solo un validador puede resolver denuncias");
+        }
+
+        const denunciaId = Number(req.body.denuncia_id);
+        if (!Number.isInteger(denunciaId) || denunciaId <= 0) {
+            return res.status(400).send("Denuncia no válida");
+        }
+
+        const denuncia = await Denuncia_usuario.findByPk(denunciaId);
+        if (!denuncia) {
+            return res.status(404).send("Denuncia no encontrada");
+        }
+
+        denuncia.estado = false;
+        await denuncia.save();
+        return res.redirect("/denunciasUsuarios");
+    } catch (error) {
+        console.error("Error al resolver la denuncia de usuario:", error);
+        return res.status(500).send("No se pudo resolver la denuncia");
+    }
+};
 
 export const agregarDenunciaImagen = async (req, res) => {
     try {
