@@ -66,6 +66,7 @@ export const seguirUsuario = async (req, res) => {
 export const cargarExplorar = async (req, res) => {
     try {
         const publicaciones = await Publicacion.findAll({
+            where: { estado: true, bloqueada_por_denuncia: false },
             include: [
                 {
                     model: Imagen,

@@ -22,3 +22,10 @@ block content
           form(action="/eliminarComentarioDenunciado" method="POST")
             input(type="hidden" name="denuncia_id" value=denuncia.id)
             button(type="submit") Eliminar mi comentario
+        if usuario && usuario.validador
+          form(action="/eliminarComentarioDenunciado" method="POST")
+            input(type="hidden" name="denuncia_id" value=denuncia.id)
+            button(type="submit") Eliminar comentario denunciado
+          form(action="/resolverDenunciaComentario" method="POST")
+            input(type="hidden" name="denuncia_id" value=denuncia.id)
+            button(type="submit") Desestimar denuncia

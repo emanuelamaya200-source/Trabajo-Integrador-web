@@ -58,6 +58,7 @@ cualquiera puede registrarse desde la app directamente, no hay usuarios cargados
 - al registrarse chequea en tiempo real si el usuario o email ya existe
 - crear publicaciones con titulo, descripcion, imagenes y etiquetas
 - comentarios por imagen, el autor puede cerrarlos individualmente, revisar denuncias y eliminar comentarios denunciados
+- los validadores pueden revisar denuncias, mantener o dar de baja publicaciones y moderar comentarios
 - valorar imagenes (una vez por usuario, el autor no puede valorar la propia)
 - buscador por titulo, descripcion y etiqueta
 - seguir y dejar de seguir usuarios

@@ -51,7 +51,8 @@ export const verUnaPublicacion = async (req, res) => {
     try {
         const { id } = req.params;
         const usuarioLogueado = Boolean(req.session && req.session.usuario);
-        const publicacion = await Publicacion.buscarUnaPublicacion(id, usuarioLogueado);
+        const esValidador = Boolean(usuarioLogueado && req.session.usuario.validador);
+        const publicacion = await Publicacion.buscarUnaPublicacion(id, usuarioLogueado, esValidador);
 
         if (!publicacion) {
             return res.status(404).send("Publicación no encontrada");

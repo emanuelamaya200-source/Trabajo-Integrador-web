@@ -39,6 +39,8 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
       const publicacionesCoincidentes = await Publicacion.findAll({
         attributes: ['id'],
         where: {
+          estado: true,
+          bloqueada_por_denuncia: false,
           [Op.or]: [
             { titulo: { [Op.like]: `%${todo}%` } },
             { descripcion: { [Op.like]: `%${todo}%` } },
@@ -65,7 +67,9 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
 
       const { count, rows } = await Publicacion.findAndCountAll({
         where: {
-          id: { [Op.in]: ids }
+          id: { [Op.in]: ids },
+          estado: true,
+          bloqueada_por_denuncia: false
         },
         include: [
           {
@@ -85,9 +89,12 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
     }
   }
 
-  static async buscarUnaPublicacion(id, logueado = false) {
+  static async buscarUnaPublicacion(id, logueado = false, esValidador = false) {
     try {
-      const publicacion = await Publicacion.findByPk(id, {
+      const publicacion = await Publicacion.findOne({
+        where: esValidador
+          ? { id }
+          : { id, estado: true, bloqueada_por_denuncia: false },
         include: [
           {
             model: Imagen,
@@ -124,15 +131,6 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
     }
   }
 
-  static async bloquearPorDenuncia(idPublicacion, options = {}) {
-    const publicacion = await Publicacion.findByPk(idPublicacion, options);
-    if (!publicacion) {
-      throw new Error(`No se encontró la publicación ${idPublicacion}`);
-    }
-
-    await publicacion.update({ bloqueada_por_denuncia: true }, options);
-    return publicacion;
-  }
 }
 
 Publicacion.init(

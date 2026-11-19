@@ -14,3 +14,7 @@ block content
         p Denunciado por: #{denuncia.denunciante.username}
         p Motivo: #{denuncia.motivo}
         p Descripción: #{denuncia.descripcion}
+        form(action="/resolverDenunciaImagen" method="POST")
+          input(type="hidden" name="denuncia_id" value=denuncia.id)
+          button(type="submit" name="accion" value="mantener") Mantener publicación
+          button(type="submit" name="accion" value="bajar") Dar de baja publicación

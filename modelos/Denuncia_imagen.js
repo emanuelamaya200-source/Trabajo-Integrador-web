@@ -37,6 +37,7 @@ export class Denuncia_imagen extends Model {
       }
 
       publicacion.EnviarAValidar = true;
+      publicacion.bloqueada_por_denuncia = true;
       await publicacion.save({ transaction: options.transaction });
     }
 

@@ -34,9 +34,7 @@ export const agregarDenunciaImagen = async (req, res) => {
                 motivo,
                 { transaction }
             );
-            // Bloquear la publicacion para que el autor no pueda modificarla.
-            await Publicacion.bloquearPorDenuncia(imagen.post_id, { transaction });
-            // Con mas de tres denuncias de usuarios distintos, se envia a validar la publicacion.
+            // Con tres denuncias de usuarios distintos, se bloquea para revisar.
             await Denuncia_imagen.verSiTieneTresDenuncias(imagen.id, { transaction });
         });
 
@@ -134,6 +132,31 @@ export const verDenunciasComentarios = async (req, res) => {
     }
 };
 
+export const resolverDenunciaComentario = async (req, res) => {
+    try {
+        if (!req.session.usuario.validador) {
+            return res.status(403).send("Solo un validador puede resolver denuncias");
+        }
+
+        const denunciaId = Number(req.body.denuncia_id);
+        if (!Number.isInteger(denunciaId) || denunciaId <= 0) {
+            return res.status(400).send("Denuncia no válida");
+        }
+
+        const denuncia = await Denuncia_comentario.findByPk(denunciaId);
+        if (!denuncia) {
+            return res.status(404).send("Denuncia no encontrada");
+        }
+
+        denuncia.estado = false;
+        await denuncia.save();
+        return res.redirect("/denunciasComentarios");
+    } catch (error) {
+        console.error("Error al resolver la denuncia del comentario:", error);
+        return res.status(500).send("No se pudo resolver la denuncia");
+    }
+};
+
 export const eliminarComentarioDenunciado = async (req, res) => {
     try {
         const denunciaId = Number(req.body.denuncia_id);
@@ -152,14 +175,19 @@ export const eliminarComentarioDenunciado = async (req, res) => {
             return res.status(404).send("Comentario no encontrado");
         }
 
-        if (Number(comentario.user_id) !== Number(req.session.usuario.id)) {
-            return res.status(403).send("Solo el autor del comentario puede borrarlo");
+        const esAutor = Number(comentario.user_id) === Number(req.session.usuario.id);
+        const esValidador = req.session.usuario.validador;
+        if (!esAutor && !esValidador) {
+            return res.status(403).send("No tenés permiso para borrar este comentario");
         }
 
-        await Denuncia_comentario.destroy({
-            where: { comentario_id: denuncia.comentario_id },
+        await sequelize.transaction(async (transaction) => {
+            await Denuncia_comentario.destroy({
+                where: { comentario_id: denuncia.comentario_id },
+                transaction,
+            });
+            await comentario.destroy({ transaction });
         });
-        await comentario.destroy();
 
         return res.redirect("/misDenunciasComentarios");
     } catch (error) {
@@ -199,5 +227,55 @@ export const verDenunciasImagenes = async (req, res) => {
     } catch (error) {
         console.error("Error al cargar las denuncias de imagenes:", error);
         return res.status(500).send("No se pudieron cargar las denuncias de imagenes");
+    }
+};
+
+export const resolverDenunciaImagen = async (req, res) => {
+    try {
+        if (!req.session.usuario.validador) {
+            return res.status(403).send("Solo un validador puede resolver denuncias");
+        }
+
+        const denunciaId = Number(req.body.denuncia_id);
+        const accion = req.body.accion;
+        if (!Number.isInteger(denunciaId) || denunciaId <= 0 ||
+            (accion !== "mantener" && accion !== "bajar")) {
+            return res.status(400).send("Datos de resolución no válidos");
+        }
+
+        const denuncia = await Denuncia_imagen.findByPk(denunciaId, {
+            include: [{ model: Imagen, as: "imagen" }],
+        });
+        if (!denuncia || !denuncia.imagen) {
+            return res.status(404).send("Denuncia no encontrada");
+        }
+
+        const publicacion = await Publicacion.findByPk(denuncia.imagen.post_id);
+        if (!publicacion) {
+            return res.status(404).send("Publicación no encontrada");
+        }
+
+        const imagenes = await Imagen.findAll({
+            where: { post_id: publicacion.id },
+            attributes: ["id"],
+        });
+        const idsImagenes = imagenes.map((imagen) => imagen.id);
+
+        await sequelize.transaction(async (transaction) => {
+            await Denuncia_imagen.update(
+                { estado: accion === "bajar" ? "resuelta" : "rechazada" },
+                { where: { imagen_id: idsImagenes }, transaction }
+            );
+
+            publicacion.estado = accion === "mantener";
+            publicacion.bloqueada_por_denuncia = false;
+            publicacion.EnviarAValidar = false;
+            await publicacion.save({ transaction });
+        });
+
+        return res.redirect("/denunciasImagenes");
+    } catch (error) {
+        console.error("Error al resolver la denuncia de imagen:", error);
+        return res.status(500).send("No se pudo resolver la denuncia");
     }
 };
