@@ -29,6 +29,7 @@ export class Usuario extends Model {
         password: contrasenia,
         email: email,
         ofertas: ofertas,
+        estado: true,
       });
       await user.save();
       return user;
@@ -110,7 +111,7 @@ Usuario.init(
     estado: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false,
+      defaultValue: true,
     },
     ofertas: {
       type: DataTypes.BOOLEAN,

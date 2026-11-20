@@ -12,7 +12,7 @@ export class Denuncia_imagen extends Model {
       motivo,
     }, options);
   }
-  static async verSiTieneTresDenuncias(id_imagen, options = {}) {
+  static async revisarDenuncias(id_imagen, options = {}) {
     const cantidad = await Denuncia_imagen.count({
       where: { imagen_id: id_imagen },
       distinct: true,
@@ -20,7 +20,7 @@ export class Denuncia_imagen extends Model {
       transaction: options.transaction,
     });
 
-    if (cantidad >= 3) {
+    if (cantidad > 0) {
       const idPublicacion = await Imagen.retornarIDDeLaPublicacionDeUnaImagen(
         id_imagen,
         { transaction: options.transaction }
@@ -36,7 +36,7 @@ export class Denuncia_imagen extends Model {
         throw new Error(`No se encontró la publicación ${idPublicacion}`);
       }
 
-      publicacion.EnviarAValidar = true;
+      publicacion.EnviarAValidar = cantidad > 3;
       publicacion.bloqueada_por_denuncia = true;
       await publicacion.save({ transaction: options.transaction });
     }

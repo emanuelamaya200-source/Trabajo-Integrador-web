@@ -16,6 +16,12 @@ export const LoguearsePost = async (req, res) => {
         const contraseniaCorrecta = await bcrypt.compare(contrasenia, usuario.password);
         
         if (contraseniaCorrecta) {
+            if (usuario.Nro_publicaciones_bajadas >= 3) {
+                return res.status(403).render('RegistroYLogin/login', {
+                    mensajes: "Tu cuenta fue desactivada",
+                });
+            }
+
             req.session.usuario = {
                 id: usuario.id,
                 username: usuario.username,

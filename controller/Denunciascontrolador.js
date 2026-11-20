@@ -122,8 +122,8 @@ export const agregarDenunciaImagen = async (req, res) => {
                 motivo,
                 { transaction }
             );
-            // Con tres denuncias de usuarios distintos, se bloquea para revisar.
-            await Denuncia_imagen.verSiTieneTresDenuncias(imagen.id, { transaction });
+            // Se bloquea desde la primera denuncia y se envía a revisar con más de tres.
+            await Denuncia_imagen.revisarDenuncias(imagen.id, { transaction });
         });
 
         return res.redirect(`/verPublicacion/${imagen.post_id}`);
@@ -354,6 +354,19 @@ export const resolverDenunciaImagen = async (req, res) => {
                 { estado: accion === "bajar" ? "resuelta" : "rechazada" },
                 { where: { imagen_id: idsImagenes }, transaction }
             );
+
+            if (accion === "bajar" && publicacion.estado) {
+                const creador = await Usuario.findByPk(publicacion.usuario_id, { transaction });
+                if (!creador) {
+                    throw new Error(`No se encontró el autor de la publicación ${publicacion.id}`);
+                }
+
+                creador.Nro_publicaciones_bajadas += 1;
+                if (creador.Nro_publicaciones_bajadas >= 3) {
+                    creador.estado = false;
+                }
+                await creador.save({ transaction });
+            }
 
             publicacion.estado = accion === "mantener";
             publicacion.bloqueada_por_denuncia = false;
