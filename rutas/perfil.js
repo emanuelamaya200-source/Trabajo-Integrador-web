@@ -11,6 +11,7 @@ router.post("/seguirUsuario/:id", requireAuth, per.seguirUsuario)
 router.post("/dejarDeSeguirUsuario/:id", requireAuth, per.dejarDeSeguirUsuario)
 router.get("/notificaciones", requireAuth, per.verNotificaciones)
 router.post("/notificaciones/:id/leida", requireAuth, per.marcarNotificacionLeida)
+router.get("/contenidoSeguidos", requireAuth, per.verContenidoSeguidos)
 router.get("/explorar", per.cargarExplorar)
 router.post("/logout", per.eliminarSession)
 

@@ -4,6 +4,9 @@ mixin nav(className = "navc")
       a(href='/') Home
     li
       a(href='/explorar') Explorar
+    if usuario
+      li
+        a(href='/contenidoSeguidos') Contenido de seguidos
     li
       input#buscar(type="text", name="Buscar", placeholder="Buscar")
     li

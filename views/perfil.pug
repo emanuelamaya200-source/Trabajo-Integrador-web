@@ -114,7 +114,7 @@ block content
             }
 
     div#seguidos.fila
-        h2 Seguidos
+        h2 Seguidos (#{usuario.seguidos.length})
         ul
             if usuario.seguidos && usuario.seguidos.length > 0
                 each item in usuario.seguidos
@@ -125,7 +125,7 @@ block content
                 li No sigue a ningún usuario aún.
                 
     div#seguidores.fila
-        h2 Seguidores
+        h2 Seguidores (#{usuario.seguidores.length})
         ul
             if usuario.seguidores && usuario.seguidores.length > 0
                 each item in usuario.seguidores

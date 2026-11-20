@@ -1,0 +1,14 @@
+extends ./layout
+include ../mixins/publicaciones.pug
+
+block content
+    h1 Contenido de seguidos
+
+    if publicaciones && publicaciones.length > 0
+        each publicacion in publicaciones
+            div.publicacion-seguido
+                p Publicado por:
+                    a(href=`/perfil/${publicacion.creador.id}`)= publicacion.creador.username
+                +publicaciones(publicacion)
+    else
+        p Las personas que seguís todavía no publicaron nada.

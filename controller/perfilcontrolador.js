@@ -2,6 +2,7 @@ import session from 'express-session';
 import { Usuario } from '../modelos/Usuario.js';
 import {Publicacion} from "../modelos/Publicacion.js"
 import { Imagen } from '../modelos/Imagen.js';
+import { Etiqueta } from '../modelos/Etiqueta.js';
 import { Seguidor } from '../modelos/Seguidor.js';
 import { Notificacion } from '../modelos/Notificacion.js';
 import e from 'express';
@@ -140,6 +141,46 @@ export const marcarNotificacionLeida = async (req, res) => {
     } catch (error) {
         console.error("Error al marcar notificación como leída:", error);
         return res.status(500).send("No se pudo actualizar la notificación");
+    }
+};
+
+export const verContenidoSeguidos = async (req, res) => {
+    try {
+        const seguidos = await Seguidor.findAll({
+            where: { seguidor_id: req.session.usuario.id },
+            attributes: ["seguido_id"],
+        });
+        const idsSeguidos = seguidos.map((seguidor) => seguidor.seguido_id);
+
+        let publicaciones = [];
+        if (idsSeguidos.length > 0) {
+            publicaciones = await Publicacion.findAll({
+                where: {
+                    usuario_id: idsSeguidos,
+                    estado: true,
+                    bloqueada_por_denuncia: false,
+                },
+                include: [
+                    { model: Imagen, as: "imagenes" },
+                    {
+                        model: Etiqueta,
+                        as: "etiquetas",
+                        through: { attributes: [] },
+                    },
+                    {
+                        model: Usuario,
+                        as: "creador",
+                        attributes: ["id", "username", "foto_de_perfil"],
+                    },
+                ],
+                order: [["createdAt", "DESC"]],
+            });
+        }
+
+        return res.render("contenidoSeguidos", { publicaciones });
+    } catch (error) {
+        console.error("Error al cargar el contenido de seguidos:", error);
+        return res.status(500).send("No se pudo cargar el contenido de seguidos");
     }
 };
 
