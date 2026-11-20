@@ -1,0 +1,19 @@
+extends ./layout
+
+block content
+  h1 Mis notificaciones
+
+  if notificaciones.length === 0
+    p No tenés notificaciones.
+  else
+    each notificacion in notificaciones
+      div
+        if notificacion.leida
+          p= notificacion.texto
+        else
+          strong= notificacion.texto
+        p= new Date(notificacion.fecha).toLocaleString("es-AR")
+        a(href=notificacion.enlace) Ver
+        if !notificacion.leida
+          form(action="/notificaciones/" + notificacion.id + "/leida" method="POST")
+            button(type="submit") Marcar como leída

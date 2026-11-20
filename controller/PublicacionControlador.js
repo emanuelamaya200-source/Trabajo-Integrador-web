@@ -4,6 +4,7 @@ import { Comentario } from '../modelos/Comentario.js';
 import { Usuario } from '../modelos/Usuario.js';
 import { Valoracion } from '../modelos/Valoracion.js';
 import { UniqueConstraintError } from 'sequelize';
+import { Notificacion } from '../modelos/Notificacion.js';
 
 export const mostrarFormulario = (req, res) => {
     res.render("Publicaciones/crearPubli");
@@ -106,6 +107,14 @@ export const crearComentario = async (req, res) => {
         }
 
         await Comentario.crearComentario(imagenId, usuarioId, contenidoNormalizado);
+        const publicacion = await Publicacion.findByPk(publicacionId);
+        if (publicacion && Number(publicacion.usuario_id) !== Number(usuarioId)) {
+            await Notificacion.create({
+                usuario_id: publicacion.usuario_id,
+                texto: `${req.session.usuario.username} comentó en tu publicación`,
+                enlace: `/verPublicacion/${publicacionId}`,
+            });
+        }
         return res.redirect(`/verPublicacion/${publicacionId}`);
     } catch (error) {
         console.error("Error al crearComentario:", error);
@@ -165,6 +174,14 @@ export const crearValoracion = async (req, res) => {
     }
 
     await Valoracion.crearValoracion(imagenId, usuarioId, puntaje);
+    const publicacion = await Publicacion.findByPk(publicacionId);
+    if (publicacion && Number(publicacion.usuario_id) !== Number(usuarioId)) {
+      await Notificacion.create({
+        usuario_id: publicacion.usuario_id,
+        texto: `${req.session.usuario.username} valoró una imagen de tu publicación`,
+        enlace: `/verPublicacion/${publicacionId}`,
+      });
+    }
     return res.redirect(`/verPublicacion/${post_id}`);
 
   } catch (error) {

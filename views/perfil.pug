@@ -68,9 +68,13 @@ block content
         img(src=usuario.foto_de_perfil alt="fotodeperfil")
         h1= usuario.username
         if !esMiPerfil
-            form
-                input#user(type="hidden", name="id_usuario", value=usuario.id)
-                input#seguir(type="button", name="seguir", value="Seguir")
+            if yaSigue
+                form(action="/dejarDeSeguirUsuario/" + usuario.id method="POST")
+                    button(type="submit") Dejar de seguir
+            else
+                form
+                    input#user(type="hidden", name="id_usuario", value=usuario.id)
+                    input#seguir(type="button", name="seguir", value="Seguir")
             form(action="/denunciarUsuario" method="POST")
                 input(type="hidden" name="usuario_id" value=usuario.id)
                 label(for="motivoDenunciaUsuario") Motivo de la denuncia
