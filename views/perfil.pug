@@ -68,6 +68,7 @@ block content
         img(src=usuario.foto_de_perfil alt="fotodeperfil")
         h1= usuario.username
         if !esMiPerfil
+            a(href=`/mensajes/${usuario.id}`) Enviar mensaje
             if yaSigue
                 form(action="/dejarDeSeguirUsuario/" + usuario.id method="POST")
                     button(type="submit") Dejar de seguir

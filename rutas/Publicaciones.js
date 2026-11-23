@@ -10,6 +10,7 @@ router.get("/CrearPublicacion", requireAuth, controller.mostrarFormulario);
 router.post("/CrearPublicacion", requireAuth, controller.crearPublicacion);
 
 //buscar publicacion
+router.get("/Buscar", controller.buscarPorFiltros);
 router.get("/Buscar/:busqueda", controller.buscarPublicaciones);
 
 //ver una sola publicacion
@@ -23,6 +24,7 @@ router.post("/cambiarEstadoComentarios", requireAuth, controller.cambiarEstadoCo
 router.post("/crearValoracion",requireAuth,controller.crearValoracion)
 
 router.post("/alternarFavorito/:id", requireAuth, interacciones.cambiarFavorito);
+router.post("/meInteresa", requireAuth, interacciones.meInteresa);
 router.get("/misFavoritos", requireAuth, interacciones.verFavoritos);
 router.post("/comprarPublicacion/:id", requireAuth, interacciones.comprarPublicacion);
 router.get("/misCompras", requireAuth, interacciones.verCompras);

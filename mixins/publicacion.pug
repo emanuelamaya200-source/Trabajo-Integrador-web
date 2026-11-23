@@ -82,6 +82,9 @@ mixin publicacion(item,mensaje)
                 input(type='hidden' name='post_id' value=item.id)
                 p.valorTexto Valor: 5
                 input(type="submit" value="Valorar")
+            form.formularioInteres(action="/meInteresa" method="POST" hidden)
+              input.inputImagenInteres(type="hidden" name="imagen_id" value="")
+              button(type="submit") Me interesa
       else
         p Imagen no encontrada
           
@@ -159,6 +162,8 @@ mixin publicacion(item,mensaje)
         const cajaCmts = document.querySelector(".cajaComentarios");
         const inputsId = document.querySelectorAll(".inputImagenId, .inputImagenId2, .inputImagenDenuncia");
         const inputImagenComentarios = document.querySelector(".inputImagenComentarios");
+        const inputImagenInteres = document.querySelector(".inputImagenInteres");
+        const formularioInteres = document.querySelector(".formularioInteres");
         const formComentarios = document.querySelector(".formComentario");
         const mensajeEstadoComentarios = document.querySelector(".mensajeEstadoComentarios");
         const botonEstadoComentarios = document.querySelector(".botonEstadoComentarios");
@@ -215,6 +220,12 @@ mixin publicacion(item,mensaje)
           });
           if (inputImagenComentarios) {
             inputImagenComentarios.value = img.id;
+          }
+          if (inputImagenInteres) {
+            inputImagenInteres.value = img.id;
+          }
+          if (formularioInteres) {
+            formularioInteres.hidden = Number(img.Precio) <= 0;
           }
 
           const comentariosPermitidos = Boolean(img.comentarios_permitidos);

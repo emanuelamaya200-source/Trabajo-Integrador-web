@@ -1,0 +1,12 @@
+extends ./layout
+
+block content
+    h1 Mis mensajes
+
+    if contactos.length > 0
+        ul
+            each contacto in contactos
+                li
+                    a(href=`/mensajes/${contacto.id}`)= contacto.username
+    else
+        p Todavía no tenés conversaciones.

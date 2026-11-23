@@ -35,17 +35,50 @@ export const crearPublicacion = async (req, res) => {
     }
 };
 
-export const buscarPublicaciones = async (req, res) => {
+const mostrarResultadosBusqueda = async (req, res, filtros) => {
     try {
-        const { busqueda } = req.params;
-        const usuarioLogueado = Boolean(req.session && req.session.usuario);
-        const { cantidad, fila } = await Publicacion.buscarPublicacionesTodo(busqueda, usuarioLogueado);
+        const hayFiltros = Object.values(filtros).some((filtro) => filtro);
+        if (!hayFiltros) {
+            return res.render("Publicaciones/busqueda", {
+                cantidad: 0,
+                publicaciones: [],
+                filtros,
+                mensajeBusqueda: "Completá al menos un filtro para buscar.",
+            });
+        }
 
-        res.render("Publicaciones/busqueda", { busqueda, cantidad, publicaciones: fila });
+        const usuarioLogueado = Boolean(req.session && req.session.usuario);
+        const { cantidad, fila } = await Publicacion.buscarPublicacionesConFiltros(filtros, usuarioLogueado);
+
+        return res.render("Publicaciones/busqueda", {
+            cantidad,
+            publicaciones: fila,
+            filtros,
+        });
     } catch (err) {
-        console.error("error", err);
-        res.status(500).send("error al buscar");
+        console.error("Error al buscar publicaciones:", err);
+        return res.status(500).send("Error al buscar publicaciones");
     }
+};
+
+const obtenerFiltro = (valor) => typeof valor === "string" ? valor.trim() : "";
+
+export const buscarPublicaciones = (req, res) => {
+    return mostrarResultadosBusqueda(req, res, {
+        texto: obtenerFiltro(req.params.busqueda),
+        titulo: "",
+        descripcion: "",
+        etiqueta: "",
+    });
+};
+
+export const buscarPorFiltros = (req, res) => {
+    return mostrarResultadosBusqueda(req, res, {
+        texto: obtenerFiltro(req.query.texto),
+        titulo: obtenerFiltro(req.query.titulo),
+        descripcion: obtenerFiltro(req.query.descripcion),
+        etiqueta: obtenerFiltro(req.query.etiqueta),
+    });
 };
 
 export const verUnaPublicacion = async (req, res) => {

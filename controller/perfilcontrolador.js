@@ -186,13 +186,16 @@ export const verContenidoSeguidos = async (req, res) => {
 
 export const cargarExplorar = async (req, res) => {
     try {
+        const usuarioLogueado = Boolean(req.session && req.session.usuario);
         const publicaciones = await Publicacion.findAll({
             where: { estado: true, bloqueada_por_denuncia: false },
             include: [
                 {
                     model: Imagen,
                     as: 'imagenes',
-                    attributes: ['Precio']
+                    attributes: ['Precio'],
+                    where: usuarioLogueado ? undefined : { copyrigth: false },
+                    required: !usuarioLogueado,
                 },
                 {
                     model: Usuario,
@@ -202,8 +205,6 @@ export const cargarExplorar = async (req, res) => {
             ],
             order: [['createdAt', 'DESC']]
         });
-        const json = JSON.stringify(publicaciones,null,2)
-        console.log(json)
         res.render("explorar", {
             publicaciones: publicaciones
         });

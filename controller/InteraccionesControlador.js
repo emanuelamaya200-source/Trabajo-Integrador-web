@@ -4,6 +4,50 @@ import { Compra } from "../modelos/Compra.js";
 import { Coleccion } from "../modelos/Coleccion.js";
 import { Publicacion } from "../modelos/Publicacion.js";
 import { Imagen } from "../modelos/Imagen.js";
+import { Notificacion } from "../modelos/Notificacion.js";
+import { Usuario } from "../modelos/Usuario.js";
+
+export const meInteresa = async (req, res) => {
+    try {
+        const imagenId = Number(req.body.imagen_id);
+        const usuarioId = Number(req.session.usuario.id);
+        if (!Number.isInteger(imagenId) || imagenId <= 0) {
+            return res.status(400).send("Imagen no válida");
+        }
+
+        const imagen = await Imagen.findByPk(imagenId);
+        if (!imagen) {
+            return res.status(404).send("Imagen no encontrada");
+        }
+
+        const publicacion = await Publicacion.findByPk(imagen.post_id);
+        if (!publicacion || !publicacion.estado || publicacion.bloqueada_por_denuncia) {
+            return res.status(404).send("Publicación no disponible");
+        }
+        if (Number(publicacion.usuario_id) === usuarioId) {
+            return res.status(403).send("No podés mostrar interés en tu propia imagen");
+        }
+        if (Number(imagen.Precio) <= 0) {
+            return res.status(400).send("Esta imagen no está a la venta");
+        }
+
+        const interesado = await Usuario.findByPk(usuarioId);
+        if (!interesado) {
+            return res.status(404).send("Usuario no encontrado");
+        }
+
+        await Notificacion.create({
+            usuario_id: publicacion.usuario_id,
+            texto: `${interesado.username} está interesado en tu publicación "${publicacion.titulo}"`,
+            enlace: `/perfil/${interesado.id}`,
+        });
+
+        return res.redirect(`/verPublicacion/${publicacion.id}`);
+    } catch (error) {
+        console.error("Error al avisar que te interesa una imagen:", error);
+        return res.status(500).send("No se pudo enviar el aviso");
+    }
+};
 
 export const cambiarFavorito = async (req, res) => {
     try {

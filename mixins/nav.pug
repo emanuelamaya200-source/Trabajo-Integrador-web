@@ -10,12 +10,16 @@ mixin nav(className = "navc")
     li
       input#buscar(type="text", name="Buscar", placeholder="Buscar")
     li
+      a(href="/Buscar") Búsqueda avanzada
+    li
       a(href='/crearPublicacion') Crear Publicación
     if usuario
       li
         a#perfil(href=`/perfil/${usuario.id}`) Ver Perfil
       li
         a(href="/notificaciones") Notificaciones
+      li
+        a(href="/mensajes") Mensajes
       li
         details.menu-administrador
           summary Mi actividad

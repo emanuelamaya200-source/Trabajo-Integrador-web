@@ -35,17 +35,42 @@ static async crearPublicacion(ptitulo, pdescripcion, etiquetas, idUsuario) {
 }
 
   static async buscarPublicacionesTodo(todo, logueado = false) {
+    return Publicacion.buscarPublicacionesConFiltros({ texto: todo }, logueado);
+  }
+
+  static async buscarPublicacionesConFiltros(filtros, logueado = false) {
     try {
+      const condiciones = [];
+
+      if (filtros.texto) {
+        condiciones.push({
+          [Op.or]: [
+            { titulo: { [Op.like]: `%${filtros.texto}%` } },
+            { descripcion: { [Op.like]: `%${filtros.texto}%` } },
+            { '$etiquetas.nombre$': { [Op.like]: `%${filtros.texto}%` } }
+          ]
+        });
+      }
+      if (filtros.titulo) {
+        condiciones.push({ titulo: { [Op.like]: `%${filtros.titulo}%` } });
+      }
+      if (filtros.descripcion) {
+        condiciones.push({ descripcion: { [Op.like]: `%${filtros.descripcion}%` } });
+      }
+      if (filtros.etiqueta) {
+        condiciones.push({ '$etiquetas.nombre$': { [Op.like]: `%${filtros.etiqueta}%` } });
+      }
+
+      if (condiciones.length === 0) {
+        return { cantidad: 0, fila: [] };
+      }
+
       const publicacionesCoincidentes = await Publicacion.findAll({
         attributes: ['id'],
         where: {
           estado: true,
           bloqueada_por_denuncia: false,
-          [Op.or]: [
-            { titulo: { [Op.like]: `%${todo}%` } },
-            { descripcion: { [Op.like]: `%${todo}%` } },
-            { '$etiquetas.nombre$': { [Op.like]: `%${todo}%` } }
-          ]
+          [Op.and]: condiciones
         },
         include: [
           {

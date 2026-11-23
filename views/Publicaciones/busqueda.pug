@@ -6,13 +6,32 @@ block estilo
 
 block content
 
-  div#ResumenDeBusquedas.fila
-    div.res
-      h1 Busqueda de: #{busqueda}
-    div.res
-      h1 Cantidad De Resultados: #{cantidad}
+  h1 Búsqueda de publicaciones
 
-  each pub in publicaciones
-    +publicaciones(pub,etiquetas)
+  form(action="/Buscar" method="GET")
+    div
+      label(for="texto") Texto en título, descripción o etiqueta
+      input#texto(type="text" name="texto" value=filtros.texto)
+    div
+      label(for="titulo") Título
+      input#titulo(type="text" name="titulo" value=filtros.titulo)
+    div
+      label(for="descripcion") Descripción
+      input#descripcion(type="text" name="descripcion" value=filtros.descripcion)
+    div
+      label(for="etiqueta") Etiqueta
+      input#etiqueta(type="text" name="etiqueta" value=filtros.etiqueta)
+    button(type="submit") Buscar
+
+  if mensajeBusqueda
+    p= mensajeBusqueda
+  else
+    p Cantidad de resultados: #{cantidad}
+
+  if publicaciones && publicaciones.length > 0
+    each pub in publicaciones
+      +publicaciones(pub)
+  else if !mensajeBusqueda
+    p No se encontraron publicaciones.
 
   script.
