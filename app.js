@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import session from 'express-session';
 import pug from 'pug';
+import { randomBytes } from 'node:crypto';
 import { sequelize, conectar } from './conexion.js';
 import { Sincronizar } from './sync.js';
 // routers
@@ -15,7 +16,9 @@ import Denuncias from './rutas/Denuncias.js';
 // CONSTANTES
 const PORT = process.env.PORT || 3000;
 const app = express();
-if (!process.env.SESSION_SECRET) {
+const sessionSecret = process.env.SESSION_SECRET ||
+    (process.env.NODE_ENV === 'production' ? null : randomBytes(32).toString('hex'));
+if (!sessionSecret) {
   throw new Error("Falta configurar SESSION_SECRET en el archivo .env");
 }
 
@@ -29,7 +32,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {

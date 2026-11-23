@@ -106,7 +106,7 @@ block content
         const reader = new FileReader();
         reader.readAsDataURL(imagen);
         reader.onload = (ev) => {
-          const item = { base64: ev.target.result, nombre: imagen.name, copyright: false, licencia: '', precio: null };
+          const item = { base64: ev.target.result, nombre: imagen.name, copyright: false, licencia: '', marcaAgua: '', precio: null };
           imagenes.push(item);
 
           const tarjeta = document.createElement('div');
@@ -127,11 +127,17 @@ block content
           licencia.type = 'text';
           licencia.placeholder = 'Texto de la licencia';
           licencia.hidden = true;
+          const marcaAgua = document.createElement('input');
+          marcaAgua.placeholder = 'Texto de la marca de agua';
+          marcaAgua.hidden = true;
           copyrightCheck.addEventListener('change', () => {
             item.copyright = copyrightCheck.checked;
             licencia.hidden = !copyrightCheck.checked;
+            marcaAgua.hidden = !copyrightCheck.checked;
+            marcaAgua.required = copyrightCheck.checked;
           });
           licencia.addEventListener('input', () => { item.licencia = licencia.value; });
+          marcaAgua.addEventListener('input', () => { item.marcaAgua = marcaAgua.value.trim(); });
 
           const precioLabel = document.createElement('label');
           const precioCheck = document.createElement('input');
@@ -152,7 +158,7 @@ block content
             item.precio = precio.value === '' ? null : Number(precio.value);
           });
 
-          opciones.append(nombre, copyrightLabel, licencia, precioLabel, precio);
+          opciones.append(nombre, copyrightLabel, licencia, marcaAgua, precioLabel, precio);
           tarjeta.append(vista, opciones);
           listaImagenes.appendChild(tarjeta);
         };
@@ -186,16 +192,42 @@ block content
       campo.value = '';
     });
 
+    async function marcarImagen(item) {
+      if (!item.copyright) return item;
+      const foto = new Image();
+      foto.src = item.base64;
+      await new Promise((resolve, reject) => {
+        foto.onload = resolve;
+        foto.onerror = reject;
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = foto.width;
+      canvas.height = foto.height;
+      const contexto = canvas.getContext('2d');
+      contexto.drawImage(foto, 0, 0);
+      contexto.font = '24px Arial';
+      contexto.lineWidth = 2;
+      contexto.strokeText(item.marcaAgua, 10, canvas.height - 15, canvas.width - 20);
+      contexto.fillStyle = 'white';
+      contexto.fillText(item.marcaAgua, 10, canvas.height - 15, canvas.width - 20);
+      return { ...item, base64: canvas.toDataURL('image/png') };
+    }
+
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!imagenes.length) return alert('Selecciona al menos una imagen');
       if (!etiquetas.length) return alert('Agrega al menos una etiqueta');
       try {
+        const imagenesConMarca = [];
+        for (const item of imagenes) {
+          if (item.copyright && !item.marcaAgua) return alert('Escribe la marca de agua');
+          imagenesConMarca.push(await marcarImagen(item));
+        }
         const res = await fetch('/CrearPublicacion', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            imagenes,
+            imagenes: imagenesConMarca,
             titulo: document.getElementById('titulo').value,
             descripcion: document.getElementById('descripcion').value,
             etiquetas
