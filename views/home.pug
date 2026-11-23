@@ -1,0 +1,53 @@
+extends ./layout
+
+block estilo
+    style.
+        .portada-lista {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .portada-tarjeta {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .portada-tarjeta img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+        }
+
+block content
+    h1 Inicio
+
+    if destacadas.length > 0
+        h2 Imágenes destacadas
+        p Se destacan las imágenes con promedio de 7 o más y al menos 3 votos.
+        p Se muestran hasta 4 destacadas y 2 recientes; si faltan, se completa con las siguientes imágenes disponibles.
+        div.portada-lista
+            each imagen in destacadas
+                div.portada-tarjeta
+                    a(href=`/verPublicacion/${imagen.publicacion_id}`)
+                        img(src=imagen.url alt=imagen.titulo)
+                        h3= imagen.titulo
+                    p Promedio: #{imagen.promedio.toFixed(1)} (#{imagen.cantidad} votos)
+                    if imagen.creador
+                        p Autor: #{imagen.creador.username}
+    else
+        h2 Imágenes destacadas
+        p Todavía no hay imágenes con suficientes votos y buena valoración.
+
+    if otras.length > 0
+        h2 Otras imágenes
+        div.portada-lista
+            each imagen in otras
+                div.portada-tarjeta
+                    a(href=`/verPublicacion/${imagen.publicacion_id}`)
+                        img(src=imagen.url alt=imagen.titulo)
+                        h3= imagen.titulo
+                    p Promedio: #{imagen.promedio.toFixed(1)} (#{imagen.cantidad} votos)
+                    if imagen.creador
+                        p Autor: #{imagen.creador.username}
+    else
+        p No hay otras imágenes para mostrar.

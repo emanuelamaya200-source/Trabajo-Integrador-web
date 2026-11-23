@@ -8,6 +8,7 @@ import { Sincronizar } from './sync.js';
 import Publicaciones from"./rutas/Publicaciones.js"
 import RegYLogin from"./rutas/RegYLogin.js"
 import { requireAuth } from './controller/autenticador.js';
+import { mostrarInicio } from './controller/InicioControlador.js';
 import perfil from './rutas/perfil.js';
 import Denuncias from './rutas/Denuncias.js';
 
@@ -58,9 +59,7 @@ app.use(perfil)
 app.use(Denuncias)
 
 // rutas
-app.get("/",(req, res , next)=>{
-    res.render("layout");  
-})
+app.get("/", mostrarInicio);
 
 // welcome sirve para mostrar un solo mensaje
 Publicaciones.get('/welcome', (req, res) => {
