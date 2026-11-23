@@ -13,18 +13,61 @@ export const mostrarFormulario = (req, res) => {
 export const crearPublicacion = async (req, res) => {
     try {
         const { imagenes, titulo, descripcion, etiquetas } = req.body;
-        for (const imagen of imagenes || []) {
+        const tituloNormalizado = typeof titulo === "string" ? titulo.trim() : "";
+        const descripcionNormalizada = typeof descripcion === "string" ? descripcion.trim() : "";
+        const etiquetasNormalizadas = Array.isArray(etiquetas)
+            ? [...new Set(etiquetas
+                .filter((etiqueta) => typeof etiqueta === "string")
+                .map((etiqueta) => etiqueta.trim())
+                .filter((etiqueta) => etiqueta))]
+            : [];
+
+        if (!tituloNormalizado || tituloNormalizado.length > 50 ||
+            descripcionNormalizada.length > 255 ||
+            !Array.isArray(imagenes) || imagenes.length === 0 ||
+            etiquetasNormalizadas.length === 0 ||
+            etiquetasNormalizadas.some((etiqueta) => etiqueta.length > 50)) {
+            return res.status(400).json({
+                ok: false,
+                error: "Completá un título, una imagen y al menos una etiqueta",
+            });
+        }
+
+        for (const imagen of imagenes) {
+            if (!imagen || typeof imagen.base64 !== "string" ||
+                !imagen.base64.startsWith("data:image/")) {
+                return res.status(400).json({ ok: false, error: "Hay una imagen no válida" });
+            }
             if (imagen.precio !== null && imagen.precio !== undefined &&
                 (!Number.isInteger(imagen.precio) || imagen.precio < 0)) {
-                return res.status(400).json({ ok: false, error: "El precio debe ser un mayor a 0" });
+                return res.status(400).json({
+                    ok: false,
+                    error: "El precio debe ser un número entero mayor o igual a 0",
+                });
             }
         }
+
         const user_id = req.session.usuario.id
-        const publicacion = await Publicacion.crearPublicacion(titulo, descripcion, etiquetas,user_id);
+        const publicacion = await Publicacion.crearPublicacion(
+            tituloNormalizado,
+            descripcionNormalizada || null,
+            etiquetasNormalizadas,
+            user_id
+        );
+        if (!publicacion) {
+            return res.status(500).json({ ok: false, error: "No se pudo crear la publicación" });
+        }
         
-        if (imagenes) {
-            for (const element of imagenes) {
-                await Imagen.crearImagen(publicacion.id, element.base64, element.copyright, element.licencia, element.precio);
+        for (const element of imagenes) {
+            const imagenCreada = await Imagen.crearImagen(
+                publicacion.id,
+                element.base64,
+                element.copyright,
+                element.licencia,
+                element.precio
+            );
+            if (!imagenCreada) {
+                return res.status(500).json({ ok: false, error: "No se pudo guardar una imagen" });
             }
         }
         return res.status(200).json({ ok: true });

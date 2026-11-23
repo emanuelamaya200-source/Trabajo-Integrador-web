@@ -12,8 +12,11 @@ import perfil from './rutas/perfil.js';
 import Denuncias from './rutas/Denuncias.js';
 
 // CONSTANTES
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const app = express();
+if (!process.env.SESSION_SECRET) {
+  throw new Error("Falta configurar SESSION_SECRET en el archivo .env");
+}
 
 //conectar
 await conectar();
@@ -25,7 +28,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(session({
-    secret: 'clave-secreta-larga',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {

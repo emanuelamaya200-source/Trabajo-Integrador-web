@@ -79,7 +79,7 @@ block content
     label(for='titulo') Titulo
     input#titulo(type='text' maxlength='50' required)
     label(for='descripcion') Descripcion
-    textarea#descripcion(maxlength='255' required)
+    textarea#descripcion(maxlength='255')
     label(for='imagen') Imagenes
     button#zonaImagen(type='button') Arrastra imagenes aqui o selecciona desde tu dispositivo
     input#imagen(type='file' accept='image/*' multiple)
@@ -189,6 +189,7 @@ block content
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!imagenes.length) return alert('Selecciona al menos una imagen');
+      if (!etiquetas.length) return alert('Agrega al menos una etiqueta');
       try {
         const res = await fetch('/CrearPublicacion', {
           method: 'POST',

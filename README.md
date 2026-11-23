@@ -14,17 +14,13 @@ video con demostracion: https://www.youtube.com/watch?v=xBSixmAtIq4
 
 ## como correrlo local
 
-por ahora para probarlo usen el servidor de arriba, el script de sql para crear la base de datos lo voy a tener para el final
-
-cuando este listo los pasos son:
-
 1. clonar el repo
 2. npm install
-3. configurar el .env (abajo esta como)
+3. copiar `.env.example` a `.env` y completar los datos de PostgreSQL
 4. npm run db:init
 5. npm start
 
-y entra en http://localhost:3000
+y entrar en http://localhost:3000. `db:init` crea o actualiza las tablas y agrega los usuarios de prueba.
 
 ---
 
@@ -40,6 +36,7 @@ DB_PASSWORD=tu_contraseña
 DB_HOST=localhost
 DB_PORT=5432
 DB_SSL=false  
+SESSION_SECRET=una_clave_larga_y_unica
 ```
 
 el DB_SSL depende de donde se corra, en local va false, en railway va true
@@ -48,7 +45,14 @@ el DB_SSL depende de donde se corra, en local va false, en railway va true
 
 ## usuarios de prueba
 
-cualquiera puede registrarse desde la app directamente, no hay usuarios cargados de antes
+`npm run db:init` crea estos usuarios de prueba:
+
+| Rol | Usuario | Contraseña |
+|---|---|---|
+| Usuario | `usuario_prueba` | `Fotaza123!` |
+| Validador | `validador_prueba` | `Validador123!` |
+
+Son cuentas para probar la aplicación, no usar estas contraseñas en un entorno real.
 
 ---
 
@@ -60,11 +64,13 @@ cualquiera puede registrarse desde la app directamente, no hay usuarios cargados
 - comentarios por imagen, el autor puede cerrarlos individualmente, revisar denuncias y eliminar comentarios denunciados
 - los validadores pueden revisar denuncias, mantener o dar de baja publicaciones y moderar comentarios
 - denunciar usuarios, guardar favoritos y organizar publicaciones en colecciones
+- marcar interes en una imagen con precio y conversar por mensajes privados
 - registrar compras de publicaciones que tienen imágenes con precio
-- notificaciones de nuevos seguidores, comentarios y valoraciones, que se pueden marcar como leídas
+- notificaciones de nuevos seguidores, comentarios, valoraciones, mensajes e interés, que se pueden marcar como leídas
 - valorar imagenes (una vez por usuario, el autor no puede valorar la propia)
-- buscador por titulo, descripcion y etiqueta
+- buscador con filtros combinables por texto, titulo, descripcion y etiqueta
 - seguir y dejar de seguir usuarios
+- sección con publicaciones de usuarios seguidos
 
 ---
 

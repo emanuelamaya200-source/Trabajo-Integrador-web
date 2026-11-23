@@ -145,6 +145,7 @@ async function RelacionarTablas() {
 
   } catch (err) {
     console.error("Error al establecer relaciones:", err);
+    throw err;
   }
 }
 
@@ -155,6 +156,7 @@ async function Sincronizar() {
     console.log('Tablas sincronizadas con éxito');
   } catch (err) {
     console.error('error al conectarse:', err);
+    throw err;
   }
 }
 
