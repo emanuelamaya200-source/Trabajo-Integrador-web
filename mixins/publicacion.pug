@@ -1,78 +1,24 @@
 mixin publicacion(item,mensaje) 
   div.publicacion(data-post-id=item.id)
-    style.
-      .publicacion, .publicacion * {
-        box-sizing: border-box;
-      }
-      .publicacion h1, .publicacion p, .publicacion li, .autor-publicacion {
-        word-break: break-word;
-        overflow-wrap: break-word;
-        max-width: 100%;
-      }
-      #publicacionparteuno {
-        overflow-y: auto;
-      }
-      .imagenes-contenedor {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 320px;
-        margin-bottom: 20px;
-        background-color: #fafafa;
-        border-radius: 12px;
-        padding: 10px;
-        overflow: hidden;
-        flex-shrink: 0;
-      }
-      .imagenPrincipal {
-        max-width: 85%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        display: block;
-        margin: 0 auto;
-        flex-shrink: 0;
-      }
-      .precioImagen {
-        font-weight: bold;
-      }
-
-      .mostrar {
-          display: none; /* Se vuelve 'flex' o 'block' con JS */
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.5); /* Fondo negro semitransparente */
-          justify-content: center;
-          align-items: center;
-          z-index: 1000; /* Asegura que esté por encima de todo lo demás */
-      }
-
-
     div#publicacionparteuno
       if item.creador
-        a(href="/perfil/" + item.creador.id style="text-decoration: none; color: inherit;")
+        a(href="/perfil/" + item.creador.id)
           p.autor-publicacion Creador de la publicación: #{item.creador.username}
         // Se mantiene fuera del tag <a> para evitar redirección
-        p#seguirautor(style="cursor: pointer;") Seguir Autor
+        p#seguirautor Seguir Autor
       else
         p.autor-publicacion Creador: Anónimo
 
       if item.imagenes && item.imagenes.length > 0 
         div.contadorImagenes 1 / #{item.imagenes.length}
         div.imagenes-contenedor
-          img.btn-izquierda(src="/left.png" height="30px" style="cursor:pointer")
+          img.btn-izquierda(src="/left.png")
           img.imagenPrincipal(src="")
-          img.btn-derecha(src="/right.png" height="30px" style="cursor:pointer")
+          img.btn-derecha(src="/right.png")
         div.caracteristicas
           p.promedio Promedio: 0
           p.copyright
-          p.precioImagen(style="display: none;")
+          p.precioImagen
           
           if usuario && (!item.creador || usuario.id != item.creador.id)
             div.bloqueValorar

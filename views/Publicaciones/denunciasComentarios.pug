@@ -10,7 +10,7 @@ block content
     p No hay comentarios denunciados.
   else
     each denuncia in denuncias
-      div
+      article
         h2
           a(href="/verPublicacion/" + denuncia.publicacion.id)= denuncia.publicacion.titulo
         p Comentario:

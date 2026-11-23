@@ -18,6 +18,6 @@ block content
   else
     ul
       each coleccion in colecciones
-        li
+        li.coleccion-item
           a(href="/coleccion/" + coleccion.id)= coleccion.titulo
           |  - #{coleccion.categoria}

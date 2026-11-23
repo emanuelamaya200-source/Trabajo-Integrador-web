@@ -7,7 +7,7 @@ block content
     p No tenés notificaciones.
   else
     each notificacion in notificaciones
-      div
+      article.notificacion-item
         if notificacion.leida
           p= notificacion.texto
         else

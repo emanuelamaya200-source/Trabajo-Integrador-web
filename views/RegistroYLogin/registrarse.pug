@@ -1,7 +1,7 @@
 extends ../layout 
 
 block content 
-    form#form(action='/registro' method='POST' style='display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: 100px auto;')
+    form#form.formulario-registro(action='/registro' method='POST')
         h3 Registro
 
         label(for='usuario') Usuario
@@ -16,14 +16,14 @@ block content
         label(for='repetir') Repetir contraseña
         input#repetir(type='password' name='repetir' required="true")
 
-        div(style='display: flex; flex-direction: row; justify-content: space-around')
-            div(style='display: flex; flex-direction: column')
+        div.opciones-registro
+            div
                 label(for='tyc')
                     | Acepta los 
                     a(href='') términos y condiciones
                 input#tyc(type='checkbox' name='terminos' required="true")
 
-            div(style='display: flex; flex-direction: column')
+            div
                 label(for='ofertas') Recibir ofertas
                 input#ofertas(type='checkbox' name='ofertas' )
 

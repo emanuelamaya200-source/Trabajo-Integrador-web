@@ -4,9 +4,9 @@ block content
     h1 Mis mensajes
 
     if contactos.length > 0
-        ul
+        ul.lista-contactos
             each contacto in contactos
-                li
+                li.coleccion-item
                     a(href=`/mensajes/${contacto.id}`)= contacto.username
     else
         p Todavía no tenés conversaciones.

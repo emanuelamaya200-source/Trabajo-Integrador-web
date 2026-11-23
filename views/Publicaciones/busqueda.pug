@@ -2,13 +2,11 @@ extends ../layout.pug
 include ../../mixins/publicaciones.pug
 
 
-block estilo
-
 block content
 
   h1 Búsqueda de publicaciones
 
-  form(action="/Buscar" method="GET")
+  form.formulario-busqueda(action="/Buscar" method="GET")
     div
       label(for="texto") Texto en título, descripción o etiqueta
       input#texto(type="text" name="texto" value=filtros.texto)
